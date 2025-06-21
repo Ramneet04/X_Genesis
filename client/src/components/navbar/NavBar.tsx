@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Search, Bell, Menu, X, ChevronDown, Globe } from 'lucide-react';
+import { Search, Menu, X, ChevronDown, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -24,8 +25,7 @@ const Navbar = () => {
 
         {/* Desktop Links */}
         <div className="hidden lg:flex items-center space-x-6">
-          <a href="#" className="hover:text-purple-400 transition-all">Home</a>
-
+          <Link to={"/"}>Home</Link>
           {/* Explore Dropdown */}
           <div className="relative">
             <button
@@ -51,29 +51,10 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* About Dropdown */}
-          <div className="relative">
-            <button
-              onMouseEnter={() => setActiveDropdown('about')}
-              onMouseLeave={() => setActiveDropdown(null)}
-              className="flex items-center space-x-1 hover:text-purple-400"
-            >
-              <span>About</span>
-              <ChevronDown className="w-4 h-4" />
-            </button>
-            {activeDropdown === 'about' && (
-              <div
-                className="absolute top-full mt-2 w-48 bg-gray-900/95 border border-purple-700/40 rounded-xl shadow-lg py-2"
-                onMouseEnter={() => setActiveDropdown('about')}
-                onMouseLeave={() => setActiveDropdown(null)}
-              >
-                {dropdownItems.about.map((item, index) => (
-                  <a key={index} href="#" className="block px-4 py-2 text-sm hover:bg-purple-800/20 hover:text-purple-400">
-                    {item}
-                  </a>
-                ))}
-              </div>
-            )}
+          <div>
+            <Link to={'/aboutUs'}>
+            <div>About Us</div>
+            </Link>
           </div>
 
           <a href="#" className="flex items-center gap-1 hover:text-purple-400">
@@ -98,11 +79,11 @@ const Navbar = () => {
           <div className="flex space-x-2">
             <Button
               variant="outline"
-              className="border border-purple-700/50 text-purple-400 hover:bg-purple-800/20"
+              className=" rounded-xl border border-purple-700/50 text-purple-400 hover:bg-purple-800/20"
             >
               Login
             </Button>
-            <Button className="bg-gradient-to-r from-purple-500 via-blue-500 to-pink-500 hover:from-purple-600 hover:via-blue-600 hover:to-pink-600 text-white font-medium shadow-lg shadow-purple-500/20">
+            <Button className=" rounded-xl bg-gradient-to-r from-purple-500 via-blue-500 to-pink-500 hover:from-purple-600 hover:via-blue-600 hover:to-pink-600 text-white font-medium shadow-lg shadow-purple-500/20">
               Signup
             </Button>
           </div>

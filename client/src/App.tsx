@@ -1,6 +1,8 @@
+import { Route, Routes } from 'react-router-dom'
 import './App.css'
 import Navbar from './components/navbar/NavBar'
-import Hero from './pages/Hero'
+import Home from './pages/Home'
+import AboutUs from './pages/AboutUs'
 
 function App() {
 
@@ -8,7 +10,10 @@ function App() {
     <>
     <div className='w-full'>
       <Navbar/>
-      <Hero/>
+      <Routes>
+        <Route path="/" element={<Home/>}></Route>
+        <Route path="/aboutUs" element={<AboutUs/>}></Route>
+      </Routes>
     </div>
     </>
   )
