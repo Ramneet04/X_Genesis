@@ -1,41 +1,90 @@
 import mongoose from "mongoose";
 
 const NftSchema = new mongoose.Schema({
-studentId: {
+
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Student",
+    ref: "User",
     required: true,
   },
-  documentUrl: {
-    type: String, // IPFS or server file URL
+
+  title: {
+    type: String,
     required: true,
   },
+
+  description: {
+    type: String,
+  },
+
+  tags: [String], // tech stack, skills, etc.
+
+  fileUrl: {
+    type: String, // IPFS URL of certificate or project image
+    required: true,
+  },
+
+  metadataUrl: {
+    type: String, // IPFS URL of metadata JSON
+    default: null,
+  },
+
   status: {
     type: String,
-    enum: ["Pending", "AI-Verified", "Institute-Verified", "Rejected", "Minted"],
+    enum: ["Pending", "AI-Verified", "Institute-Verified", "Ready", "Minted"],
     default: "Pending",
   },
+
   verifiedBy: {
     type: String,
     enum: ["Self", "AI", "Institute", "Both"],
     default: "Self",
   },
-  metadataUrl: {
-    type: String, // IPFS URL (e.g. ipfs://QmXYZ...)
+
+  // Ratings out of 5, average and count
+  rating: {
+    average: { type: Number, default: 0 },
+    count: { type: Number, default: 0 },
+  },
+
+  // Number of likes from recruiters or public
+  likes: {
+    type: Number,
+    default: 0,
+  },
+
+  // Array of endorsements (text + who endorsed)
+  endorsements: [
+    {
+      endorsedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User", // could be institute/recruiter
+      },
+      message: String,
+      date: { type: Date, default: Date.now },
+    },
+  ],
+
+  // NFT info
+  tokenId: {
+    type: String,
     default: null,
   },
-  nftTokenId: {
-    type: String, // From your smart contract mint result
-    default: null,
-  },
+
   issuedAt: {
-    type: Date, // When NFT was minted
+    type: Date, // When NFT is minted
     default: null,
   },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+  contributors: [
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
+    role: String, // Optional: "Lead", "Developer", "Designer", etc.
+  }
+],
+
 })
 
 const Nft= mongoose.model("Nft",NftSchema);
