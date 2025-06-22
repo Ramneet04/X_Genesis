@@ -2,7 +2,10 @@ import express from 'express';
 import cors from 'cors'
 import 'dotenv/config'
 import { router } from './routes/vi';
+import Dbconnect from './config/database'
 const PORT = process.env.PORT || 8000;
+Dbconnect();
+
 const app=express();
 app.use(express.json());
 app.use(
