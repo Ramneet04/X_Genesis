@@ -52,6 +52,10 @@ const NftSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  submittedTo: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Organization", // university, company, bootcamp, etc.
+  },
 
   // Array of endorsements (text + who endorsed)
   endorsements: [
