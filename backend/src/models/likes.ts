@@ -16,3 +16,5 @@ const LikeSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+const Like = mongoose.model("Like", LikeSchema);
+export default Like;

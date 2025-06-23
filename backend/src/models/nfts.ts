@@ -42,32 +42,26 @@ const NftSchema = new mongoose.Schema({
   },
 
   // Ratings out of 5, average and count
-  rating: {
-    average: { type: Number, default: 0 },
-    count: { type: Number, default: 0 },
-  },
+  rating: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Rating"
+  }],
 
   // Number of likes from recruiters or public
-  likes: {
-    type: Number,
-    default: 0,
-  },
+  likes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref:"Like"
+  }],
   submittedTo: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Organization", // university, company, bootcamp, etc.
   },
 
   // Array of endorsements (text + who endorsed)
-  endorsements: [
-    {
-      endorsedBy: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "User", // could be institute/recruiter
-      },
-      message: String,
-      date: { type: Date, default: Date.now },
-    },
-  ],
+  endorsements: [{
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Endorsement"
+  }],
 
   // NFT info
   tokenId: {
