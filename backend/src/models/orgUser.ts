@@ -15,8 +15,8 @@ const OrgUserSchema = new mongoose.Schema({
 
   role: {
     type: String,
-    enum: ["Verifier", "Admin"],
-    default: "Verifier"
+    enum: ["OrgAdmin", "OrgUser"],
+    default: "OrgUser"
   },
 
   isActive: { type: Boolean, default: true },

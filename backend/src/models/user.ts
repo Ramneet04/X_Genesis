@@ -41,8 +41,12 @@ const UserSchema = new mongoose.Schema(
     // User Type
     role: {
       type: String,
-      enum: ["Student", "Recruiter", "OrgUser", "Admin"],
-      default: "Student",
+      enum: ["User", "Recruiter", "OrgAdmin", "OrgUser", "SuperAdmin"],
+      default: "User",
+    },
+
+    resetPasswordExpires: {
+      type: Date,
     },
 
     // Optional Profile Fields
@@ -79,7 +83,9 @@ const UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-
+    token: {
+      type: String,
+    },
     // Timestamps
     createdAt: {
       type: Date,

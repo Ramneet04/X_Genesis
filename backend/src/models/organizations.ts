@@ -4,7 +4,7 @@ const OrganizationSchema = new mongoose.Schema({
   name: String,
   domain: String,
   approved: { type: Boolean, default: false }, // system-level admin approval
-  logoUrl: String,
+  logo: String,
   description: String,
   
   orgUsers: [
