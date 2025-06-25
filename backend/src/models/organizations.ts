@@ -1,20 +1,30 @@
 import mongoose, { mongo } from "mongoose";
 
 const OrganizationSchema = new mongoose.Schema({
-  name: String,
-  domain: String,
-  approved: { type: Boolean, default: false }, // system-level admin approval
+  name: {
+    type: String,
+    required: true,
+    trim: true
+  },
+
+  domain: {
+    type: String,
+    trim: true
+  },
+
+  approved: { //system level aproove
+    type: Boolean,
+    default: false
+  },
+
   logo: String,
+
   description: String,
-  
-  orgUsers: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "OrgUser"
-    }
-  ],
-  
-  createdAt: { type: Date, default: Date.now },
+
+  createdAt: {
+    type: Date,
+    default: Date.now
+  }
 })
 
 const Organization = mongoose.model("Organization", OrganizationSchema);

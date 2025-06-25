@@ -40,7 +40,7 @@ const Navbar = () => {
 
         {/* Desktop Links */}
         <div className="hidden lg:flex items-center space-x-6">
-          <a href="#" className="text-gray-800 hover:text-gray-900 font-medium transition-colors">
+          <a href="#" className="text-zinc-800 hover:text-gray-900 font-medium transition-colors">
             Home
           </a>
           
@@ -49,14 +49,14 @@ const Navbar = () => {
             <button
               onMouseEnter={() => handleMouseEnter('explore')}
               onMouseLeave={handleMouseLeave}
-              className="flex items-center space-x-1 text-gray-800 hover:text-gray-900 font-medium transition-colors"
+              className="flex items-center space-x-1 text-zinc-800 hover:text-gray-900 font-medium transition-colors"
             >
               <span>Explore</span>
               <ChevronDown className="w-4 h-4" />
             </button>
             {activeDropdown === 'explore' && (
               <div
-                className="absolute top-full mt-2 w-48 bg-white border border-gray-200 rounded-xl shadow-lg py-2 z-50"
+                className="absolute top-full mt-2 w-48 bg-white sahdow shadow-gray-600 rounded-xl shadow-lg py-2 z-50"
                 onMouseEnter={() => handleMouseEnter('explore')}
                 onMouseLeave={handleMouseLeave}
               >
@@ -64,7 +64,7 @@ const Navbar = () => {
                   <a 
                     key={index} 
                     href="#" 
-                    className="block px-4 py-2 text-sm text-gray-600 hover:bg-gray-50 hover:text-gray-900 transition-colors"
+                    className="block font-semibold px-4 py-3 text-sm text-gray-600 rounded-xl hover:bg-gradient-to-r from-purple-500 via-blue-500 to-pink-500 hover:text-white transition-colors border border-gray-100"
                   >
                     {item}
                   </a>
@@ -74,12 +74,12 @@ const Navbar = () => {
           </div>
 
           <div>
-            <a href="#" className="text-gray-800 hover:text-gray-900 font-medium transition-colors">
+            <a href="#" className="text-zinc-800 hover:text-gray-900 font-medium transition-colors">
               About Us
             </a>
           </div>
 
-          <a href="#" className="flex items-center gap-1 text-gray-800 hover:text-gray-900 font-medium transition-colors">
+          <a href="#" className="flex items-center gap-1 text-zinc-800 hover:text-gray-900 font-medium transition-colors">
             <Globe className="w-4 h-4" />
             <span>Community</span>
           </a>
@@ -101,7 +101,7 @@ const Navbar = () => {
           <div className="flex space-x-2">
             <Button
               variant="outline"
-              className="rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-200 hover:text-gray-900 transition-colors"
+              className="rounded-xl border bg-zinc-800 text-white border-gray-300  hover:bg-gray-200 hover:text-gray-900 transition-colors"
             >
               Login
             </Button>

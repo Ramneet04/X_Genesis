@@ -5,7 +5,7 @@ import bcrypt from 'bcryptjs'
 import jwt from "jsonwebtoken";
 import otpGenerator from "otp-generator";
 import 'dotenv/config';
-exports.signup =async (req:Request, res:Response)=>{
+export const signup =async (req:Request, res:Response)=>{
     try {
         const {
             firstName,
@@ -83,7 +83,7 @@ exports.signup =async (req:Request, res:Response)=>{
     }
 }
 
-exports.login = async (req:Request, res:Response)=>{
+export const login = async (req:Request, res:Response)=>{
     try {
         const {email, password} = req.body;
 
@@ -139,7 +139,7 @@ exports.login = async (req:Request, res:Response)=>{
     }
 }
 
-exports.sendotp = async (req, res) => {
+export const sendotp = async (req:Request, res:Response) => {
   try {
     const { email } = req.body
 
@@ -180,7 +180,7 @@ exports.sendotp = async (req, res) => {
       otp,
     })
   } catch (err) {
-    console.log(err.message)
-    return res.status(500).json({ success: false, error: err.message })
+    console.error(err?.message)
+    return res.status(500).json({ success: false, error: err?.message })
   }
 }

@@ -22,5 +22,6 @@ const OrgUserSchema = new mongoose.Schema({
   isActive: { type: Boolean, default: true },
   joinedAt: { type: Date, default: Date.now }
 });
+OrgUserSchema.index({ user: 1, organization: 1 }, { unique: true });
 const OrgUser = mongoose.model("OrgUser", OrgUserSchema);
 export default OrgUser;
