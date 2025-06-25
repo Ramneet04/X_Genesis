@@ -19,6 +19,10 @@ const NftSchema = new mongoose.Schema({
 
   tags: [String], // tech stack, skills, etc.
 
+  category: {
+     type: String, // "Course Certificate", "Project", "Hackathon", etc.
+  },
+
   fileUrl: {
     type: String, // IPFS URL of certificate or project image
     required: true,
@@ -29,16 +33,14 @@ const NftSchema = new mongoose.Schema({
     default: null,
   },
 
-  status: {
-    type: String,
-    enum: ["Pending", "AI-Verified", "Institute-Verified", "Ready", "Minted"],
-    default: "Pending",
-  },
-
   verifiedBy: {
     type: String,
     enum: ["Self", "AI", "Institute", "Both"],
     default: "Self",
+  },
+  organization: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "Organization"
   },
 
   // Ratings out of 5, average and count
@@ -52,10 +54,6 @@ const NftSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref:"Like"
   }],
-  submittedTo: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Organization", // university, company, bootcamp, etc.
-  },
 
   // Array of endorsements (text + who endorsed)
   endorsements: [{
@@ -69,7 +67,7 @@ const NftSchema = new mongoose.Schema({
     default: null,
   },
 
-  issuedAt: {
+  mintedAt: {
     type: Date, // When NFT is minted
     default: null,
   },
@@ -82,6 +80,11 @@ const NftSchema = new mongoose.Schema({
     role: String, // Optional: "Lead", "Developer", "Designer", etc.
   }
 ],
+visibility: {
+  type: String,
+  enum: ["public", "private", "unlisted"],
+  default: "public"
+}
 
 })
 
