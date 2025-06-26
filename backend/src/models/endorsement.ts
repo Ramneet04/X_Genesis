@@ -2,12 +2,12 @@ import mongoose from "mongoose";
 
 const EndorsementSchema = new mongoose.Schema(
   {
-    nft: {
+    nftId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Nft",
       required: true,
     },
-    endorsedBy: {
+    userId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,

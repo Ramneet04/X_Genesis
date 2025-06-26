@@ -43,24 +43,6 @@ const NftSchema = new mongoose.Schema({
   ref: "Organization"
   },
 
-  // Ratings out of 5, average and count
-  rating: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Rating"
-  }],
-
-  // Number of likes from recruiters or public
-  likes: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref:"Like"
-  }],
-
-  // Array of endorsements (text + who endorsed)
-  endorsements: [{
-  type: mongoose.Schema.Types.ObjectId,
-  ref: "Endorsement"
-  }],
-
   // NFT info
   tokenId: {
     type: String,
@@ -82,8 +64,8 @@ const NftSchema = new mongoose.Schema({
 ],
 visibility: {
   type: String,
-  enum: ["public", "private", "unlisted"],
-  default: "public"
+  enum: ["Public", "Private", "Unlisted"],
+  default: "Public"
 }
 
 })

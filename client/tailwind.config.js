@@ -7,6 +7,19 @@ export default {
   ],
   theme: {
   	extend: {
+		animation: {
+        // Define your custom animation utility here
+        // 'utility-name': 'keyframes-name duration timing-function iteration-count'
+        float: 'float 3s ease-in-out infinite', // This makes `animate-float` available
+      },
+      keyframes: {
+        // Define the actual keyframe rules here
+        float: {
+          '0%': { transform: 'translateY(0px)' },
+          '50%': { transform: 'translateY(-5px)' }, // Moves up by 5px
+          '100%': { transform: 'translateY(0px)' },
+        }
+      },
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
@@ -57,5 +70,6 @@ export default {
   	}
   },
   plugins: [require("tailwindcss-animate")],
+  
 }
 

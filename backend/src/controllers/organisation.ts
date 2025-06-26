@@ -6,7 +6,7 @@ import OrgUser from "../models/orgUser";
 export const createOrganization = async (req:Request, res:Response)=>{
     try {
         const { name, domain, logo, description } = req.body;
-        const userId = req.user.id;
+        const userId = (req as any).user.id;
         const organization = await Organization.create({ 
             name,
             domain,

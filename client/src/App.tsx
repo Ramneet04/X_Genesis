@@ -8,7 +8,7 @@ function App() {
 
   return (
     <>
-    <div className='w-full'>
+    <div className='w-full bg-gray-950'>
       <Navbar/>
       <Routes>
         <Route path="/" element={<Home/>}></Route>
