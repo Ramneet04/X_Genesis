@@ -5,11 +5,10 @@ import bcrypt from 'bcryptjs'
 import jwt from "jsonwebtoken";
 import otpGenerator from "otp-generator";
 import 'dotenv/config';
-export const signup =async (req:Request, res:Response)=>{
+export const signup =async (req:any,res:any)=>{
     try {
         const {
-            firstName,
-            lastName,
+            userName,
             email,
             password,
             confirmPassword,
@@ -17,8 +16,7 @@ export const signup =async (req:Request, res:Response)=>{
             otp
         } = req.body;
 
-        if(!firstName ||
-            !lastName ||
+        if(!userName ||
             !email ||
             !password ||
             !confirmPassword ||
@@ -61,8 +59,7 @@ export const signup =async (req:Request, res:Response)=>{
         const hashedPassword = await bcrypt.hash(password, 10);
 
         const user = await User.create({
-            firstName,
-            lastName,
+            userName,
             email,
             password: hashedPassword,
             role
@@ -83,7 +80,7 @@ export const signup =async (req:Request, res:Response)=>{
     }
 }
 
-export const login = async (req:Request, res:Response)=>{
+export const login = async (req:any, res:any)=>{
     try {
         const {email, password} = req.body;
 
@@ -107,6 +104,9 @@ export const login = async (req:Request, res:Response)=>{
                 message: "Invalid password"
                 })
         }
+        if (!process.env.JWT_SECRET) {
+            throw new Error("JWT_SECRET is not defined in environment variables");
+          }
         const token = jwt.sign(
             { id: user._id, email: user.email, role: user.role },
             process.env.JWT_SECRET,
@@ -114,8 +114,9 @@ export const login = async (req:Request, res:Response)=>{
                 expiresIn: "24h",
             }
         )
-        user.token = token;
-        user.password = "";
+        const userData = user.toObject() as any;
+        userData.token = token;
+        userData.password = "";
 
         const options = {
             expires: new Date(Date.now()+3 * 24 * 60 * 60 * 1000),
@@ -125,7 +126,7 @@ export const login = async (req:Request, res:Response)=>{
         return res.cookie("token", token, options).status(200).json({
             success: true,
             message: "User logged in successfully",
-            user,
+            user : userData,
             token
         });
 
@@ -139,7 +140,7 @@ export const login = async (req:Request, res:Response)=>{
     }
 }
 
-export const sendotp = async (req:Request, res:Response) => {
+export const sendotp = async (req:any, res:any) => {
   try {
     const { email } = req.body
 
@@ -180,7 +181,12 @@ export const sendotp = async (req:Request, res:Response) => {
       otp,
     })
   } catch (err) {
-    console.error(err?.message)
-    return res.status(500).json({ success: false, error: err?.message })
+    if (err instanceof Error) {
+        console.error(err.message);
+        return res.status(500).json({ success: false, error: err.message });
+      } else {
+        console.error(err);
+        return res.status(500).json({ success: false, error: "An unknown error occurred." });
+      }
   }
 }

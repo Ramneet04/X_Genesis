@@ -16,10 +16,20 @@ const OrganizationSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  pendingNfts:{
+         type: [mongoose.Schema.Types.ObjectId],
+         ref:"PendingNft",
+         default: []
+  },
+  logo: {
+    type: String,
+    default: null
+  },
 
-  logo: String,
-
-  description: String,
+  description: {
+    type: String,
+    default: null
+  },
 
   createdAt: {
     type: Date,

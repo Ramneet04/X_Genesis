@@ -3,15 +3,20 @@ import mongoose from "mongoose";
 const UserSchema = new mongoose.Schema(
   {
     // Basic Info
-    firstName: {
+    userName: {
       type: String,
       required: true,
+      unique: true,
+    },
+    firstName: {
+      type: String,
+      default: null,
       trim: true,
     },
 
     lastName: {
       type: String,
-      required: true,
+      default: null,
       trim: true,
     },
 
@@ -30,6 +35,7 @@ const UserSchema = new mongoose.Schema(
 
     phone: {
       type: String,
+      default: null
     },
 
     // Web3 Wallet
@@ -58,33 +64,47 @@ const UserSchema = new mongoose.Schema(
     bio: {
       type: String,
       maxlength: 500,
+      default:null
     },
 
-    country: String,
+    country: {
+      type: String,
+      default: null
+    },
+
     language: {
       type: String,
       default: "en",
     },
 
     // NFT Credentials (linked NFTs owned by the user)
-    credentials: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
+    credentials:{
+        type: [mongoose.Schema.Types.ObjectId],
         ref: "Nft",
-      },
-    ],
-
-    // Recruiter-specific fields (optional)
-    company: String,
-    designation: String,
+        default: []
+    },
+    pendingNfts:{
+       type: [mongoose.Schema.Types.ObjectId],
+       ref:"PendingNft",
+       default: []
+    },
+    company: {
+      type: String,
+      default: null,
+    },
+    designation: {
+      type: String,
+      default: null,
+    },
 
     // For verifying login OTPs or email verification
     isVerified: {
       type: Boolean,
       default: false,
     },
-    token: {
+    nftToken: {
       type: String,
+      default: null
     },
     // Timestamps
     createdAt: {
@@ -94,24 +114,24 @@ const UserSchema = new mongoose.Schema(
 
     lastLogin: Date,
     //social features
-        friends: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
+    friends: {
+        type: [mongoose.Schema.Types.ObjectId],
         ref: "User",
-      },
-    ],
+       default: [],
+    },
 
-    friendRequests: [
-      {
-        from: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-        status: {
-          type: String,
-          enum: ["pending", "accepted", "rejected"],
-          default: "pending",
-        },
-        sentAt: { type: Date, default: Date.now },
-      },
-    ],
+    friendRequests: {
+  type: [{
+    from: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    status: {
+      type: String,
+      enum: ["pending", "accepted", "rejected"],
+      default: "pending",
+    },
+    sentAt: { type: Date, default: Date.now },
+  }],
+  default: [],
+}
   },
   {
     timestamps: true,

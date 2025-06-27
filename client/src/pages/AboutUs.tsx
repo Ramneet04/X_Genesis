@@ -1,155 +1,152 @@
-// import { Card, CardContent } from "@/components/ui/card";
-const missionSteps = [
-  {
-    title: "Empowering Students",
-    description:
-      "We aim to give students a tamper-proof identity for their achievements through soulbound NFTs linked to their wallet.",
-  },
-  {
-    title: "AI-Driven Authenticity",
-    description:
-      "Our AI layer ensures every document is contextually and structurally verified before human approval.",
-  },
-  {
-    title: "Verified by Institutions",
-    description:
-      "Institutes manually verify after AI passes the credentials — ensuring trust from source to chain.",
-  },
-  {
-    title: "Tamper-Proof NFTs",
-    description:
-      "Once verified, a soulbound NFT is minted and stored on-chain, accessible forever without fakes.",
-  },
-  {
-    title: "Open to Recruiters",
-    description:
-      "Recruiters can discover real talent through verified credentials, projects, and tags — transparently and globally.",
-  },
-];
-const learningGrid = [
-  {
-    order: -1,
-    heading: "Decentralized Verification for",
-    HighLightedText: "Every Learner",
-    description:
-      "X_Genesis enables students to showcase authentic, verified credentials using blockchain-powered NFTs — eliminating fraud and manual verifications globally.",
-    BtnText: "Explore Platform",
-    BtnLink: "/explore",
-  },
-  {
-    order: 1,
-    heading: "AI-Powered Document Screening",
-    description:
-      "Our built-in AI engine analyzes certificates and project documents for plagiarism, formatting, and context — before human validation.",
-  },
-  {
-    order: 2,
-    heading: "Trusted Institute Validation",
-    description:
-      "Institutions validate credentials after AI pre-verification, ensuring every NFT minted is backed by a recognized authority.",
-  },
-  {
-    order: 3,
-    heading: "Soulbound Credential NFTs",
-    description:
-      "Verified documents are minted as Soulbound NFTs — non-transferable, tamper-proof, and publicly verifiable on-chain.",
-  },
-  {
-    order: 4,
-    heading: "Smart Recruiter Matching",
-    description:
-      "Recruiters can search and filter profiles based on verified credentials, skills, and tags — no fake resumes, just real talent.",
-  },
-  {
-    order: 5,
-    heading: "One Identity, Multiple Proofs",
-    description:
-      "Each student wallet holds multiple NFTs tied to their academic journey — projects, certificates, awards — all in one place.",
-  },
-];
+import React, { useEffect, useState } from 'react';
 
 const AboutUs = () => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    // Trigger fade-in animation on component mount
+    setIsVisible(true);
+  }, []);
+
   return (
-    <section className="min-h-screen bg-gray-950 text-white px-6 py-16">
-      <div className="max-w-6xl mx-auto text-center">
-        <h1 className="text-4xl md:text-5xl font-bold mb-6 text-teal-400">
-          🧬 About X_Genesis
-        </h1>
-        <p className="text-lg md:text-xl max-w-3xl mx-auto text-gray-300 leading-relaxed">
-          X_Genesis is a decentralized credential verification platform powered
-          by <span className="text-teal-300 font-medium">NFTs</span> and{" "}
-          <span className="text-purple-300 font-medium">AI</span>. We help
-          students showcase verified achievements, enable institutions to
-          authenticate credentials, and empower recruiters to discover top
-          talent — all on-chain.
-        </p>
-
-        {/* Feature Cards */}
-        <section className="bg-gray-950 text-white px-6 pt-20 pb-4">
-      <div className="max-w-5xl mx-auto">
-        <h2 className="text-4xl font-bold text-center text-teal-400 mb-12">
-          🎯 Our Mission
-        </h2>
-
-        <div className="relative border-l-2 border-purple-700 ml-4">
-          {missionSteps.map((step, index) => (
-            <div key={index} className="mb-10 ml-6 relative">
-              <div className="absolute -left-4 top-1 w-4 h-4 bg-purple-500 rounded-full border-2 border-white" />
-              <h3 className="text-xl font-semibold text-purple-300">
-                {step.title}
-              </h3>
-              <p className="text-slate-300 mt-2 text-sm leading-relaxed">
-                {step.description}
-              </p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-        {/* Collage */}
-{/* Learning Grid (Enhanced) */}
-<div className="w-11/12 mt-20 grid mx-auto grid-cols-1 lg:grid-cols-4 mb-10 items-stretch gap-6">
-  {learningGrid.map((card, index) => {
-    // Define heading color for each card
-    const headingColors = [
-      "text-teal-300",
-      "text-purple-300",
-      "text-yellow-300",
-      "text-pink-300",
-      "text-indigo-300",
-      "text-green-300",
-    ];
-    const headingColor = headingColors[index % headingColors.length];
-
-    return (
-      <div
-        key={index}
-        className={`
-          ${index === 0 ? "lg:col-span-2" : ""}
-          ${card.order % 2 === 1 ? "bg-slate-800" : "bg-slate-900"}
-          ${card.order === 3 ? "lg:col-start-2" : ""}
-          ${card.order === -1 ? "bg-slate-950" : ""}
-          lg:h-[300px] h-auto text-white p-6 rounded-md flex
-        `}
-      >
-        <div className="flex flex-col gap-4">
-          <h2 className={`text-2xl font-semibold ${headingColor}`}>
-            {card.heading}
-          </h2>
-          <p className="text-slate-300 text-sm md:text-base leading-relaxed">
-            {card.description}
+    <div
+      className={`
+        bg-gray-950 text-gray-200 min-h-screen p-6 sm:p-10 lg:p-16
+        flex flex-col items-center
+        transition-opacity duration-1000 ease-in
+        ${isVisible ? 'opacity-100' : 'opacity-0'}
+      `}
+    >
+      <div className="max-w-4xl mx-auto w-full">
+        {/* Header Section */}
+        <header className="text-center mb-12 animate-fade-in-up">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600 mb-4">
+            About X-Genesis
+          </h1>
+          <p className="text-lg sm:text-xl text-gray-400 max-w-2xl mx-auto">
+            Pioneering the next era of digital ownership and creation.
           </p>
-        </div>
+        </header>
+
+        {/* Mission/Introduction Section */}
+        <section className="mb-12 p-6 bg-gray-900 rounded-xl shadow-lg border border-gray-700 animate-fade-in-delay-1">
+          <h2 className="text-3xl font-semibold text-blue-400 mb-4">Our Mission</h2>
+          <p className="text-gray-300 leading-relaxed mb-4">
+            At X-Genesis, our mission is to empower creators, innovators, and collectors by providing a secure, transparent, and groundbreaking platform for digital assets. We believe in democratizing access to the metaverse, fostering a community where creativity thrives and digital ownership is truly sovereign.
+          </p>
+          <p className="text-gray-300 leading-relaxed">
+            We are building the foundational layer for a new digital economy, ensuring that every digital creation finds its true value and every interaction is a step towards a more decentralized future.
+          </p>
+        </section>
+
+        {/* Our Story/History Section */}
+        <section className="mb-12 p-6 bg-gray-900 rounded-xl shadow-lg border border-gray-700 animate-fade-in-delay-2">
+          <h2 className="text-3xl font-semibold text-purple-400 mb-4">Our Journey</h2>
+          <p className="text-gray-300 leading-relaxed mb-4">
+            Founded in [Year, e.g., 2023] by a team of blockchain enthusiasts, visionary artists, and seasoned developers, X-Genesis emerged from a shared passion for digital art and a firm belief in the transformative power of NFTs. We started with a simple idea: to create a platform that not only showcases digital masterpieces but also cultivates a vibrant ecosystem for Web3 innovation.
+          </p>
+          <p className="text-gray-300 leading-relaxed">
+            From our early days as a small collective, we have grown into a leading force in the NFT space, driven by community feedback and a relentless pursuit of excellence. Our journey is a testament to what can be achieved when technology meets creativity.
+          </p>
+        </section>
+
+        {/* Our Values Section */}
+        <section className="mb-12 p-6 bg-gray-900 rounded-2xl shadow-xl border border-gray-700 animate-[fadeInFromBottom_1s_ease-out_forwards_0.6s]">
+  <h2 className="text-3xl font-semibold text-cyan-400 mb-10 text-center">Our Core Values</h2> {/* Increased bottom margin for heading */}
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8"> {/* Changed to lg:grid-cols-4 for more horizontal flow on large screens */}
+    {/* Value Item 1: Innovation */}
+    <div className="flex flex-col items-center text-center p-6 bg-gray-800 rounded-lg shadow-md hover:shadow-2xl hover:shadow-cyan-500/30 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
+      <div className="text-5xl mb-4 text-cyan-400">💡</div> {/* Larger icon, themed color */}
+      <h3 className="text-xl font-medium text-gray-100 mb-2">Innovation</h3>
+      <p className="text-gray-400 text-sm"> {/* Slightly smaller text for description */}
+        We relentlessly push the boundaries of what's possible in the digital realm.
+      </p>
+    </div>
+
+    {/* Value Item 2: Community */}
+    <div className="flex flex-col items-center text-center p-6 bg-gray-800 rounded-lg shadow-md hover:shadow-2xl hover:shadow-purple-500/30 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
+      <div className="text-5xl mb-4 text-purple-400">🤝</div> {/* Larger icon, themed color */}
+      <h3 className="text-xl font-medium text-gray-100 mb-2">Community</h3>
+      <p className="text-gray-400 text-sm">
+        We foster a supportive and inclusive environment for all creators and collectors.
+      </p>
+    </div>
+
+    {/* Value Item 3: Transparency */}
+    <div className="flex flex-col items-center text-center p-6 bg-gray-800 rounded-lg shadow-md hover:shadow-2xl hover:shadow-blue-500/30 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
+      <div className="text-5xl mb-4 text-blue-400">✅</div> {/* Larger icon, themed color */}
+      <h3 className="text-xl font-medium text-gray-100 mb-2">Transparency</h3>
+      <p className="text-gray-400 text-sm">
+        Blockchain is built on trust, and so are our operations.
+      </p>
+    </div>
+
+    {/* Value Item 4: Security */}
+    <div className="flex flex-col items-center text-center p-6 bg-gray-800 rounded-lg shadow-md hover:shadow-2xl hover:shadow-green-500/30 transition-all duration-300 transform hover:-translate-y-2 cursor-pointer">
+      <div className="text-5xl mb-4 text-green-400">🔒</div> {/* Larger icon, themed color */}
+      <h3 className="text-xl font-medium text-gray-100 mb-2">Security</h3>
+      <p className="text-gray-400 text-sm">
+        Protecting digital assets and user data is our highest priority.
+      </p>
+    </div>
+  </div>
+</section>
+
+        {/* Team Section (Simplified) */}
+        <section className="mb-12 p-6 bg-gray-900 rounded-xl shadow-lg border border-gray-700 animate-fade-in-delay-4">
+          <h2 className="text-3xl font-semibold text-green-400 mb-4">Meet the Team</h2>
+          <p className="text-gray-300 leading-relaxed mb-4">
+            X-Genesis is powered by a diverse team of passionate experts in blockchain, AI, UI/UX design, and community building. While our team is currently building in stealth, rest assured that every member is dedicated to bringing you the most innovative and reliable platform in the metaverse.
+          </p>
+          <p className="text-gray-300 leading-relaxed">
+            We are always looking for visionary talent. If you share our passion, consider joining us on this exciting journey!
+          </p>
+          <div className="text-center mt-6">
+            <a
+              href="/careers" // Replace with your careers page link
+              className="inline-block bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              Join Our Team
+            </a>
+          </div>
+        </section>
+
+        {/* Call to Action/Contact */}
+        <section className="text-center p-6 bg-gray-900 rounded-xl shadow-lg border border-gray-700 animate-fade-in-delay-5">
+          <h2 className="text-3xl font-semibold text-gray-100 mb-4">Have Questions?</h2>
+          <p className="text-lg text-gray-400 mb-6">
+            We'd love to hear from you. Reach out and connect with the X-Genesis community.
+          </p>
+          <a
+            href="/contact" // Replace with your contact page link
+            className="inline-block bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
+          >
+            Contact Us
+          </a>
+        </section>
       </div>
-    );
-  })}
-</div>
-
-
-
-      </div>
-    </section>
+    </div>
   );
 };
 
 export default AboutUs;
+
+// You might also want to add these simple keyframe animations to your global CSS
+// or configure them in your tailwind.config.js for cleaner code:
+
+/*
+@keyframes fadeInFromBottom {
+  0% { opacity: 0; transform: translateY(20px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in-up {
+  animation: fadeInFromBottom 1s ease-out forwards;
+}
+
+.animate-fade-in-delay-1 { animation: fadeInFromBottom 1s ease-out forwards 0.2s; }
+.animate-fade-in-delay-2 { animation: fadeInFromBottom 1s ease-out forwards 0.4s; }
+.animate-fade-in-delay-3 { animation: fadeInFromBottom 1s ease-out forwards 0.6s; }
+.animate-fade-in-delay-4 { animation: fadeInFromBottom 1s ease-out forwards 0.8s; }
+.animate-fade-in-delay-5 { animation: fadeInFromBottom 1s ease-out forwards 1s; }
+*/

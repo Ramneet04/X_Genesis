@@ -11,10 +11,12 @@ export const auth = async (req:Request, res:Response, next: NextFunction)=>{
         }
 
         try {
+            if (!process.env.JWT_SECRET) {
+                throw new Error("JWT_SECRET is not defined in environment variables");
+            }
             const decode = await jwt.verify(token, process.env.JWT_SECRET);
             console.log(decode);
-            req.user = decode;
-
+            (req as any).user = decode;
         } catch (error) {
             return res.status(401).json({
                 message: "Invalid token",
@@ -29,10 +31,9 @@ export const auth = async (req:Request, res:Response, next: NextFunction)=>{
         })
     }
 }
-
 export const isUser = async (req:Request,res:Response,next: NextFunction)=>{
     try {
-        const  {email} = req?.user;
+        const  {email} = (req as any).user;
         const userDetails = await User.findOne({email});
         if(!userDetails){
             return res.status(401).json({
@@ -56,7 +57,7 @@ export const isUser = async (req:Request,res:Response,next: NextFunction)=>{
 }
 export const isRecruiter = async (req:Request,res:Response,next: NextFunction)=>{
     try {
-        const  {email} = req?.user;
+        const  {email} = (req as any).user;
         const userDetails = await User.findOne({email});
         if(!userDetails){
             return res.status(401).json({
@@ -80,7 +81,7 @@ export const isRecruiter = async (req:Request,res:Response,next: NextFunction)=>
 }
 export const isSuperAdmin = async (req:Request,res:Response,next: NextFunction)=>{
     try {
-        const  {email} = req?.user;
+        const  {email} = (req as any).user;
         const userDetails = await User.findOne({email});
         if(!userDetails){
             return res.status(401).json({

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Search, Menu, X, ChevronDown, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Link } from 'react-router-dom';
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -32,7 +33,8 @@ const Navbar = () => {
       <div className="flex justify-between items-center p-4 lg:px-12 w-full">
         {/* Logo */}
         <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 bg-gradient-to-br from-purple-600 via-blue-600 to-pink-600 rounded-xl animate-pulse flex justify-center items-center text-3xl font-extrabold text-white">✘</div>
+          {/* <div className="w-10 h-10 bg-gradient-to-br from-purple-600 via-blue-600 to-pink-600 rounded-xl animate-pulse flex justify-center items-center text-3xl font-extrabold text-white">✘</div> */}
+          <img src="https://res.cloudinary.com/ddlepk8lb/image/upload/v1751051815/x_genesis_logo3_w9eyr4.jpg" alt="" width={55} className='rounded-xl shadow-md shadow-sky-300'/>
           <span className="text-2xl font-bold bg-gradient-to-r from-purple-400 via-blue-400 to-pink-400 bg-clip-text text-transparent">
             Genesis
           </span>
@@ -40,9 +42,9 @@ const Navbar = () => {
 
         {/* Desktop Links */}
         <div className="hidden lg:flex items-center space-x-6">
-          <a href="#" className="text-gray-300 hover:text-white font-medium transition-colors">
+          <Link to={"/"} className="text-gray-300 hover:text-white font-medium transition-colors">
             Home
-          </a>
+          </Link>
           
           {/* Explore Dropdown */}
           <div className="relative">
@@ -74,9 +76,9 @@ const Navbar = () => {
           </div>
 
           <div>
-            <a href="#" className="text-gray-300 hover:text-white font-medium transition-colors">
+            <Link to={"/aboutUs"} className="text-gray-300 hover:text-white font-medium transition-colors">
               About Us
-            </a>
+            </Link>
           </div>
 
           <a href="#" className="flex items-center gap-1 text-gray-300 hover:text-white font-medium transition-colors">
@@ -103,10 +105,10 @@ const Navbar = () => {
               variant="outline"
               className="rounded-xl border border-gray-600 bg-gray-800 text-white hover:bg-gray-700 hover:border-gray-500 transition-colors"
             >
-              Login
+              <Link to={"/login"}>Login</Link>
             </Button>
             <Button className="rounded-xl bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 hover:from-purple-700 hover:via-blue-700 hover:to-pink-700 text-white font-medium shadow-lg shadow-purple-600/30">
-              Signup
+              <Link to={"/signup"}>Signup</Link>
             </Button>
           </div>
 

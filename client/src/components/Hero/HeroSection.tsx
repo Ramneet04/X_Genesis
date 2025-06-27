@@ -77,7 +77,8 @@ const HeroSection = () => {
           </h1>
 
           <p className="text-xl text-gray-400 leading-relaxed max-w-lg">
-            XGenesis empowers students and institutions to mint soulbound NFTs for verified certificates, projects, and achievements with immutable blockchain security.
+            From verified skills to published papers — mint it all.
+XGenesis brings academic and professional credentials to the blockchain as NFTs.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 pt-1">

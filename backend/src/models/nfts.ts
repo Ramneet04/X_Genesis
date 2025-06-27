@@ -7,6 +7,10 @@ const NftSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  currentOwner: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User"
+  },
 
   title: {
     type: String,
@@ -51,7 +55,7 @@ const NftSchema = new mongoose.Schema({
 
   mintedAt: {
     type: Date, // When NFT is minted
-    default: null,
+    default: Date.now(),
   },
   contributors: [
   {
@@ -66,6 +70,19 @@ visibility: {
   type: String,
   enum: ["Public", "Private", "Unlisted"],
   default: "Public"
+},
+forSale: {
+  type: Boolean,
+  default: false,
+},
+price: {
+  type: Number, // or String if in crypto
+  default: null,
+},
+currency: {
+  type: String,
+  enum: ["MATIC", "ETH", "USDT"],
+  default: "MATIC",
 }
 
 })
