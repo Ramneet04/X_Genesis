@@ -5,6 +5,7 @@ import Home from './pages/Home'
 import AboutUs from './pages/AboutUs'
 import LoginCard from './components/auth/login'
 import SignupCard from './components/auth/signup'
+import VerifyEmail from './pages/VerifyEmail'
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
         <Route path="/aboutUs" element={<AboutUs/>}></Route>
         <Route path="/login" element={<LoginCard/>}></Route>
         <Route path="/signup" element={<SignupCard/>}></Route>
+        <Route path="/verify-email" element={<VerifyEmail/>}></Route>
       </Routes>
     </div>
     </>

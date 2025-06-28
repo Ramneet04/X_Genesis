@@ -1,17 +1,33 @@
-import React, { useState } from "react";
+import React, { useState, type ChangeEvent, type FormEvent } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
-import { Link } from "react-router-dom"; // Import Link from react-router-dom
+import { Link, useNavigate } from "react-router-dom"; // Import Link from react-router-dom
+import { useAppDispatch } from "@/main";
+import { login } from "@/services/operations/user";
 
 const LoginCard: React.FC = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    email:"",
+    password: ""
+  });
+  const handleOnChange = (e:ChangeEvent<HTMLInputElement>)=>{
+    setFormData((prevData)=>({
+      ...prevData,
+      [e.target.name]:e.target.value
+    }))
+  }
+  const {email, password} = formData;
   const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const handleOnSubmit = (e:FormEvent<HTMLFormElement>)=>{
+    e.preventDefault();
+    dispatch(login(email,password,navigate));
+  }
 
   return (
     <div className="h-screen overflow-y-hidden bg-gray-950 flex flex-col lg:flex-row">
@@ -22,7 +38,8 @@ const LoginCard: React.FC = () => {
             <CardTitle className="text-white text-3xl font-bold text-center">Welcome Back!</CardTitle>
           </CardHeader>
           <CardContent>
-            <form className="space-y-6">
+            <form onSubmit={handleOnSubmit}
+            className="space-y-6">
               <div>
                 <Label htmlFor="email" className="text-gray-300 text-sm font-medium mb-1 block">
                   Email Address
@@ -31,7 +48,7 @@ const LoginCard: React.FC = () => {
                   id="email"
                   type="email"
                   value={email}
-                  onChange={(e) => setEmail(e.target.value)}
+                  onChange={handleOnChange}
                   placeholder="you@example.com"
                   className="mt-1 bg-gray-700 text-white border-gray-600 focus:border-yellow-400 focus:ring-yellow-400"
                   required
@@ -46,7 +63,7 @@ const LoginCard: React.FC = () => {
                   id="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={handleOnChange}
                   placeholder="••••••••"
                   className="mt-1 pr-10 bg-gray-700 text-white border-gray-600 focus:border-yellow-400 focus:ring-yellow-400"
                   required
@@ -62,18 +79,11 @@ const LoginCard: React.FC = () => {
                 </button>
               </div>
 
-              {error && (
-                <p className="text-red-400 text-sm text-center" role="alert">
-                  {error}
-                </p>
-              )}
-
               <Button
                 type="submit"
                 className="w-full bg-yellow-400 text-gray-900 font-semibold py-2 rounded-md hover:bg-yellow-300 transition-colors duration-200 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isLoading}
               >
-                {isLoading ? "Logging in..." : "Login"}
+                Login
               </Button>
             </form>
             <p className="text-center text-gray-400 text-sm mt-6">

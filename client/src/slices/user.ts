@@ -30,35 +30,54 @@ export interface User {
   friends: string[]
   friendRequests: FriendRequest[]
 }
-
+export interface SignupData {
+    email: string | null
+    password: string | null
+    confirmPassword: string | null
+    role: string | null
+    userName: string | null
+}
 interface UserState {
     user: User | null
     token: string | null
-    loading: boolean,
+    loading: {
+    auth: boolean
+    profile: boolean
+    friends: boolean
+  }
     error: string | null
+    signupData: SignupData | null
 }
 
 const initialState: UserState = {
     user: null,
-    loading: false,
+    loading: {
+    auth: false,
+    profile: false,
+    friends: false,
+    },
     token: localStorage.getItem("token") ? localStorage.getItem("token") : null,
     error: null,
+    signupData: null
 }
 
 const userSlice = createSlice({
     name: "user",
     initialState,
     reducers: {
-        setUser(state, action : PayloadAction<User>){
+        setUser(state, action : PayloadAction<User | null>){
             state.user = action.payload
             state.error = null
         },
-        setToken(state, action : PayloadAction<string>){
+        setToken(state, action : PayloadAction<string | null>){
             state.token = action.payload;
-            localStorage.setItem("token", action.payload)
+            if (action.payload) {
+                localStorage.setItem("token", action.payload);
+            }
         },
-        setLoading(state, action: PayloadAction<boolean>){
-            state.loading = action.payload
+       setLoading(state, action: PayloadAction<{ key: keyof UserState['loading'], value: boolean }>) {
+          const { key, value } = action.payload;
+          state.loading[key] = value;
         },
         setError(state, action: PayloadAction<string | null>){
             state.error = action.payload
@@ -73,6 +92,9 @@ const userSlice = createSlice({
             if(state.user){
                 state.user = {...state.user, ...action.payload};
             }
+        },
+        setSignupData(state, action:PayloadAction<SignupData | null>){
+            state.signupData = action.payload
         }
     }
 })
@@ -83,7 +105,8 @@ export const {
     setError,
     setLoading,
     clearUser,
-    updateUser
+    updateUser,
+    setSignupData
 } = userSlice.actions;
 
 export default userSlice.reducer;

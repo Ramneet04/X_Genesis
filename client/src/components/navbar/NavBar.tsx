@@ -2,8 +2,13 @@ import { useState } from 'react';
 import { Search, Menu, X, ChevronDown, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { useAppSelector } from '@/main';
 
 const Navbar = () => {
+  
+  const {token, user} = useAppSelector((state)=> state.user);
+
+
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const [dropdownTimeout, setDropdownTimeout] = useState<NodeJS.Timeout | null>(null);
@@ -99,8 +104,9 @@ const Navbar = () => {
             />
           </div>
 
-          {/* Auth Buttons */}
-          <div className="flex space-x-2">
+          {
+            token === null && (
+               <div className="flex space-x-2">
             <Button
               variant="outline"
               className="rounded-xl border border-gray-600 bg-gray-800 text-white hover:bg-gray-700 hover:border-gray-500 transition-colors"
@@ -112,6 +118,8 @@ const Navbar = () => {
             </Button>
           </div>
 
+            )
+          }
           {/* Mobile Menu Button */}
           <button 
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)} 
