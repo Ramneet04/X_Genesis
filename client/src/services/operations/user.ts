@@ -7,7 +7,8 @@ import type {AppDispatch} from "../../main"
 const {
     LOGIN_API,
     SIGNUP_API,
-    SEND_OTP_API
+    SEND_OTP_API,
+    CHECK_USERNAME_API
 } = authEndpoints;
 
 export function sendOtp(email:string, navigate:(path:string)=>void){
@@ -35,6 +36,7 @@ export function signUp(userName:string,email:string,password:string,confirmPassw
     return async (dispatch: AppDispatch) =>{
         const toasId = toast.loading("Loading...");
         dispatch(setLoading({key:"auth", value:true}));
+        console.log(userName);
         try {
             const response = await apiConnector("POST", SIGNUP_API, {
                 role,
@@ -71,20 +73,21 @@ export function login(email:string, password:string, navigate:(path:string)=>voi
             if(!response.data.success){
                 throw new Error(response.data.message);
             }
+            toast.dismiss(toasId);
             toast.success("Login Successful");
             dispatch(setToken(response.data.token));
             const userImage = response.data?.user?.profileImage ? response.data.user.profileImage : 
             `https://api.dicebear.com/5.x/initials/svg?seed=${response.data.user.userName}`;
             dispatch(setUser({ ...response.data.user, profileImage:userImage}));
             localStorage.setItem("token",  JSON.stringify(response.data.token));
-            localStorage.setItem("user",  JSON.stringify(response.data.user));
+            localStorage.setItem("user",  JSON.stringify({...response.data.user, profileImage:userImage}));
             navigate("/dashboard/my-profile")
         } catch (error) {
             console.log(error);
+            toast.dismiss(toasId);
             toast.error("Could not login");
         }
         dispatch(setLoading({key:"auth", value:false}));
-        toast.dismiss(toasId);
     }
 }
 
@@ -97,4 +100,22 @@ export function logOut(navigate:(path:string)=>void){
         toast.success("Loged Out");
         navigate("/");
     }
+}
+export async function checkUserName(userName: string): Promise<boolean | null> {
+    console.log("userName: ",userName);
+  try {
+    const response = await apiConnector(
+      "GET",
+      CHECK_USERNAME_API,
+      null,               
+      null,               
+      { userName: userName }        
+    );
+
+    return response.data.available; 
+  } catch (error) {
+    console.error("Error checking username:", error);
+    toast.error("Failed to check username");
+    return null;
+  }
 }

@@ -3,6 +3,7 @@ import { Search, Menu, X, ChevronDown, Globe } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '@/main';
+import ProfileDropDown from './ProfileDropDown';
 
 const Navbar = () => {
   
@@ -117,8 +118,11 @@ const Navbar = () => {
               <Link to={"/signup"}>Signup</Link>
             </Button>
           </div>
-
             )
+          }
+
+          {
+            token !== null && (<ProfileDropDown />)
           }
           {/* Mobile Menu Button */}
           <button 

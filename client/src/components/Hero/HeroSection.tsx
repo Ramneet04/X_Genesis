@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Award, Shield } from 'lucide-react';
 import RatingCard from './HeroCard'; // Assuming HeroCard is your single, dark-themed card
+import toast from 'react-hot-toast';
 
 const HeroSection = () => {
   const [isVisible, setIsVisible] = useState(false);

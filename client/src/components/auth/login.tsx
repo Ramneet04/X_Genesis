@@ -47,9 +47,10 @@ const LoginCard: React.FC = () => {
                 <Input
                   id="email"
                   type="email"
+                  name="email"
                   value={email}
                   onChange={handleOnChange}
-                  placeholder="you@example.com"
+                  placeholder="Enter your email"
                   className="mt-1 bg-gray-700 text-white border-gray-600 focus:border-yellow-400 focus:ring-yellow-400"
                   required
                   aria-describedby="email-error"
@@ -61,10 +62,11 @@ const LoginCard: React.FC = () => {
                 </Label>
                 <Input
                   id="password"
+                  name="password"
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={handleOnChange}
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   className="mt-1 pr-10 bg-gray-700 text-white border-gray-600 focus:border-yellow-400 focus:ring-yellow-400"
                   required
                   aria-describedby="password-error"

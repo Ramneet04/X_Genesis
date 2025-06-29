@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Eye, EyeOff } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom"; // Import Link from react-router-dom
 import { useAppDispatch } from "@/main";
-import { sendOtp } from "@/services/operations/user";
+import { checkUserName, sendOtp } from "@/services/operations/user";
 import toast from "react-hot-toast";
 import { setSignupData } from "@/slices/user";
 
@@ -15,6 +15,7 @@ const SignUpCard: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [isAvailable, setIsAvailable] = useState<boolean | null>(null);
   // const [userRole, setUserRole] = useState("User"); 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -28,6 +29,7 @@ const SignUpCard: React.FC = () => {
       toast.error("Passwords Do Not Match");
       return;
     }
+
     const signupData = {
       userName: username,
       email,
@@ -41,6 +43,11 @@ const SignUpCard: React.FC = () => {
     setEmail("");
     setPassword("");
     setConfirmPassword("");
+  }
+  const handleBlur = async ()=>{
+      if (!username.trim()) return;
+  const available = await checkUserName(username);
+  setIsAvailable(available);
   }
   return (
     <div className="bg-gray-950 flex justify-center flex-col lg:flex-row h-[100%]">
@@ -67,7 +74,14 @@ const SignUpCard: React.FC = () => {
                   placeholder="john.doe"
                   className="mt-1 pr-10 bg-gray-700 text-white border-gray-600 focus:border-yellow-400 focus:ring-yellow-400"
                   required
+                  onBlur={handleBlur}
                 />
+                {isAvailable === false && (
+  <p className="text-red-500 text-sm">Username is already taken</p>
+)}
+{isAvailable === true && (
+  <p className="text-green-500 text-sm">Username is available</p>
+)}
               </div>
               <div>
                 <Label htmlFor="email" className="text-gray-300 text-sm font-medium mb-1 block">

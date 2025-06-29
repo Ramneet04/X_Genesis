@@ -38,7 +38,7 @@ export interface SignupData {
     userName: string | null
 }
 interface UserState {
-    user: User | null
+    user: User | null 
     token: string | null
     loading: {
     auth: boolean
@@ -50,7 +50,7 @@ interface UserState {
 }
 
 const initialState: UserState = {
-    user: null,
+    user: localStorage.getItem("user") ? JSON.parse(localStorage.getItem("user") as string) : null,
     loading: {
     auth: false,
     profile: false,

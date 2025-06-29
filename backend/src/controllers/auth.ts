@@ -190,3 +190,21 @@ export const sendotp = async (req:any, res:any) => {
       }
   }
 }
+
+export const checkUserName = async (req:any, res:any) => {
+  try {
+    const { userName } = req.query;
+    console.log("hello",userName);
+    
+  const user = await User.findOne({ userName: userName });
+  if (user) {
+    return res.status(200).json({ success:true,available: false });
+  }
+  return res.status(200).json({ success:true,available: true });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "An unknown error occurred",
+    })
+  }
+}
