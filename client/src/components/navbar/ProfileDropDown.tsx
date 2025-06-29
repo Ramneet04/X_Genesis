@@ -1,95 +1,79 @@
+// components/shared/ProfileDropDown.tsx
 import type React from "react";
-// import { Link } from "react-router-dom";
-// import { Button } from "../ui/button";
 import { useAppDispatch, useAppSelector } from "@/main";
 import { useNavigate } from "react-router-dom";
 import { logOut } from "@/services/operations/user";
-import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuPortal,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
 
+const ProfileDropDown: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const { user } = useAppSelector((state) => state.user);
+  const greetings = ["👋", "😊", "🚀", "💻", "🌟", "🏆", "🧭"];
+  const randomEmoji = greetings[Math.floor(Math.random() * greetings.length)];
+  const logoutHandler = () => {
+    dispatch(logOut(navigate));
+  };
 
-const ProfileDropDown:React.FC = ()=>{
-    const dispatch = useAppDispatch();
-    const navigate = useNavigate();
+  if (!user) return null;
 
-    const logoutHandler = ()=>{
-        dispatch(logOut(navigate));
-    }
-    const {user, token} = useAppSelector((state)=> state.user);
-    if(token)console.log(user);
-    if(!user)return null;
-    if(user)
-    console.log("img-->",user.profileImage);
-    return (
-        <div className="text-white">
-                <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <img src={user?.profileImage} alt="" className="aspect-square w-[30px] rounded-full object-cover focus-visible:outline-none" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="start">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
-        <DropdownMenuGroup>
-          <DropdownMenuItem>
-            Profile
-            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+  return (
+    <div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            className="rounded-full p-[2px] border border-gray-800 hover:ring-2 hover:ring-gray-600 transition focus-visible:outline-none"
+            title="Open Profile Menu"
+          >
+            <img
+              src={user.profileImage || "/placeholder.png"}
+              alt="Profile"
+              className="aspect-square w-[38px] rounded-full object-cover shadow-sm"
+            />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          className="w-52 bg-black text-gray-200 shadow-xl border border-gray-900 rounded-2xl"
+          align="end"
+        >
+          <DropdownMenuLabel className="text-gray-400 text-sm px-3 py-1">
+           Hello, {user.firstName || user.userName} {randomEmoji}
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator className="bg-gray-700" />
+          <DropdownMenuItem asChild>
+            <button
+             onClick={() => navigate("/dashboard")}
+             className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-800 hover:text-white transition-colors duration-200"
+           >
+             My Dashboard
+           </button>
+                   </DropdownMenuItem>
+                   <DropdownMenuItem asChild>
+           <button
+             onClick={() => navigate("/settings")}
+             className="w-full text-left px-3 py-2 rounded-md hover:bg-gray-800 hover:text-white transition-colors duration-200"
+           >
+             Settings
+           </button>
+         </DropdownMenuItem>
+          <DropdownMenuSeparator className="bg-gray-700" />
+          <DropdownMenuItem
+            onClick={logoutHandler}
+            className="px-3 py-2 rounded-md text-red-500 font-medium hover:bg-red-600 hover:text-white transition-all duration-200 cursor-pointer"
+          >
+            Log out
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            Billing
-            <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            Settings
-            <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            Keyboard shortcuts
-            <DropdownMenuShortcut>⌘K</DropdownMenuShortcut>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuItem>Team</DropdownMenuItem>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>Invite users</DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem>Email</DropdownMenuItem>
-                <DropdownMenuItem>Message</DropdownMenuItem>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem>More...</DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-          <DropdownMenuItem>
-            New Team
-            <DropdownMenuShortcut>⌘+T</DropdownMenuShortcut>
-          </DropdownMenuItem>
-        </DropdownMenuGroup>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem>GitHub</DropdownMenuItem>
-        <DropdownMenuItem>Support</DropdownMenuItem>
-        <DropdownMenuItem disabled>API</DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={logoutHandler}>
-          Log out
-          <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-        </div>
-    )
-}
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+};
+
 export default ProfileDropDown;

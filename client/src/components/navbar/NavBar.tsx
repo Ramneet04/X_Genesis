@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Search, Menu, X, ChevronDown, Globe } from 'lucide-react';
+import { Search, Menu, X, ChevronDown, Globe, PlusCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { useAppSelector } from '@/main';
 import ProfileDropDown from './ProfileDropDown';
+import WalletConnectButton from '../auth/ConnectWallet';
 
 const Navbar = () => {
   
@@ -72,7 +73,7 @@ const Navbar = () => {
                   <a 
                     key={index} 
                     href="#" 
-                    className="block font-semibold px-4 py-3 text-sm text-gray-300 rounded-xl hover:bg-gradient-to-r hover:from-purple-600 hover:via-blue-600 hover:to-pink-600 hover:text-white transition-colors"
+                    className="block font-semibold px-4 py-3 text-sm text-gray-300 rounded-xl hover:bg-gradient-to-r hover:from-cyan-600 hover:via-blue-700 hover:to-indigo-800 hover:text-white transition-colors"
                   >
                     {item}
                   </a>
@@ -96,14 +97,12 @@ const Navbar = () => {
         {/* Right Side */}
         <div className="flex items-center space-x-4">
           {/* Search Bar */}
-          <div className="hidden md:flex items-center space-x-2 bg-gray-800 rounded-3xl px-4 py-2.5 border border-gray-600">
-            <Search className="w-6 h-4 text-gray-400 text-md" />
-            <input
-              type="text"
-              placeholder="Search..."
-              className="bg-transparent border-none outline-none text-sm text-white placeholder-gray-500 w-40"
-            />
-          </div>
+         <Link to="/create-nft">
+           <Button className="hidden md:flex items-center gap-2 rounded-xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-700 hover:from-cyan-400 hover:via-blue-500 hover:to-indigo-600 text-white font-semibold">
+             <PlusCircle className="w-5 h-5" />
+             <span>Create NFT</span>
+           </Button>
+         </Link>
 
           {
             token === null && (
@@ -120,7 +119,11 @@ const Navbar = () => {
           </div>
             )
           }
-
+          {
+            token !== null && (
+              <WalletConnectButton/>
+            )
+          }
           {
             token !== null && (<ProfileDropDown />)
           }
