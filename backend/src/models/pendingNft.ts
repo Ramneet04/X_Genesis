@@ -1,16 +1,16 @@
 import mongoose from "mongoose";
 
 const PendingNftSchema = new mongoose.Schema({
-  user: {
+ user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true
+    required: true,
   },
 
   organization: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Organization",
-    required: true
+    required: true,
   },
 
   title: {
@@ -18,39 +18,58 @@ const PendingNftSchema = new mongoose.Schema({
     required: true,
   },
 
-  description: {
-    type: String,
-  },
+  description: String,
 
-  tags: [String], // tech stack, skills, etc.
+  tags: [String], // e.g. skills, tech, etc.
 
   category: {
-     type: String, // "Course Certificate", "Project", "Hackathon", etc.
+    type: String,
+    enum: ["Project", "Internship", "Certificate", "Hackathon", "ResearchPaper"],
+    required: true,
   },
 
   fileUrl: {
     type: String,
-    required: true
+    required: true, // IPFS file link (PDF/image)
+  },
+
+  metadataUrl: {
+    type: String,
+    default: null, // Generated after approval (can be filled later)
+  },
+
+  isSoulBound: {
+    type: Boolean,
+    default: false, // Optional: can be set by user
   },
 
   status: {
     type: String,
     enum: ["pending", "approved", "rejected"],
-    default: "pending"
+    default: "pending",
   },
 
-  reasonForRejection: String,
+  reasonForRejection: {
+    type: String,
+    default: null,
+  },
 
   submittedAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
 
   reviewedAt: Date,
 
+  reviewedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Organization", // Or admin/reviewer model if applicable
+  },
+
   mintedNFT: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Nft" // once minted, linked here
+    ref: "Nft", // Once approved and minted
+    default: null,
   }
 });
 

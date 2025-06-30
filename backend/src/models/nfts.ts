@@ -22,10 +22,11 @@ const NftSchema = new mongoose.Schema({
   },
 
   tags: [String], // tech stack, skills, etc.
-
   category: {
-     type: String, // "Course Certificate", "Project", "Hackathon", etc.
+  type: String,
+  enum: ["Project", "Internship", "Certificate", "Hackathon", "ResearchPaper"],
   },
+
 
   fileUrl: {
     type: String, // IPFS URL of certificate or project image
@@ -34,7 +35,7 @@ const NftSchema = new mongoose.Schema({
 
   metadataUrl: {
     type: String, // IPFS URL of metadata JSON
-    default: null,
+    required: true,
   },
 
   verifiedBy: {
@@ -49,9 +50,13 @@ const NftSchema = new mongoose.Schema({
 
   // NFT info
   tokenId: {
-    type: String,
+    type: Number,
     default: null,
   },
+  isSoulBound: {
+  type: Boolean,
+  default: false,
+ },
 
   mintedAt: {
     type: Date, // When NFT is minted

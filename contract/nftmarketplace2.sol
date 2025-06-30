@@ -9,7 +9,7 @@ contract NFTMarketplace is ERC721URIStorage {
     using Counters for Counters.Counter;
 
     Counters.Counter private _tokenIds;
-    Counters.Counter private _itemSold;
+    Counters.Counter private _itemsSold;
 
     uint public listingPrice = 0.0025 ether;
     address payable public owner;
@@ -26,7 +26,7 @@ contract NFTMarketplace is ERC721URIStorage {
         Category category;
     }
 
-    mapping(uint => MarketItem) private idMarketItem;
+    mapping(uint => MarketItem) private idToMarketItem;
 
     event MarketItemCreated(
         uint indexed tokenId,
@@ -39,7 +39,7 @@ contract NFTMarketplace is ERC721URIStorage {
     );
 
     modifier onlyOwner() {
-        require(msg.sender == owner, "Only marketplace owner");
+        require(msg.sender == owner, "Only marketplace owner can call this");
         _;
     }
 
@@ -58,11 +58,11 @@ contract NFTMarketplace is ERC721URIStorage {
     function createToken(
         string memory tokenURI,
         uint price,
-        Category category,
-        bool isSoulBound  // 👈 user-defined now
+        bool isSoulBound,
+        Category category
     ) public payable returns (uint) {
-        require(price > 0, "Price must be > 0");
         require(msg.value == listingPrice, "Pay listing fee");
+        require(price > 0 || isSoulBound, "Non-soulbound NFTs must have a price");
 
         _tokenIds.increment();
         uint newTokenId = _tokenIds.current();
@@ -81,7 +81,7 @@ contract NFTMarketplace is ERC721URIStorage {
         bool isSoulBound,
         Category category
     ) private {
-        idMarketItem[tokenId] = MarketItem(
+        idToMarketItem[tokenId] = MarketItem(
             tokenId,
             payable(msg.sender),
             payable(address(this)),
@@ -93,35 +93,26 @@ contract NFTMarketplace is ERC721URIStorage {
 
         _transfer(msg.sender, address(this), tokenId);
 
-        emit MarketItemCreated(tokenId, msg.sender, address(this), price, false, isSoulBound, category);
-    }
-
-    function resellToken(uint tokenId, uint price) public payable {
-        MarketItem storage item = idMarketItem[tokenId];
-
-        require(item.owner == msg.sender, "Not your NFT");
-        require(msg.value == listingPrice, "Listing fee required");
-        require(!item.isSoulBound, "This NFT is soulbound");
-
-        item.sold = false;
-        item.price = price;
-        item.seller = payable(msg.sender);
-        item.owner = payable(address(this));
-
-        _itemSold.decrement();
-        _transfer(msg.sender, address(this), tokenId);
+        emit MarketItemCreated(
+            tokenId,
+            msg.sender,
+            address(this),
+            price,
+            false,
+            isSoulBound,
+            category
+        );
     }
 
     function createMarketSale(uint tokenId) public payable {
-        MarketItem storage item = idMarketItem[tokenId];
-        uint price = item.price;
-
-        require(msg.value == price, "Pay full price");
+        MarketItem storage item = idToMarketItem[tokenId];
+        require(!item.isSoulBound, "Soulbound NFTs cannot be sold");
+        require(msg.value == item.price, "Pay the asking price");
 
         item.owner = payable(msg.sender);
         item.sold = true;
 
-        _itemSold.increment();
+        _itemsSold.increment();
 
         _transfer(address(this), msg.sender, tokenId);
 
@@ -129,71 +120,84 @@ contract NFTMarketplace is ERC721URIStorage {
         item.seller.transfer(msg.value);
     }
 
+    function resellToken(uint tokenId, uint price) public payable {
+        MarketItem storage item = idToMarketItem[tokenId];
+
+        require(item.owner == msg.sender, "You are not the owner");
+        require(!item.isSoulBound, "Soulbound NFTs cannot be resold");
+        require(msg.value == listingPrice, "Pay listing fee");
+
+        item.sold = false;
+        item.price = price;
+        item.seller = payable(msg.sender);
+        item.owner = payable(address(this));
+
+        _itemsSold.decrement();
+
+        _transfer(msg.sender, address(this), tokenId);
+    }
+
     function fetchMarketItems() public view returns (MarketItem[] memory) {
-        uint itemCount = _tokenIds.current();
-        uint unsoldItemCount = _tokenIds.current() - _itemSold.current();
+        uint totalCount = _tokenIds.current();
+        uint unsoldCount = totalCount - _itemsSold.current();
         uint currentIndex = 0;
 
-        MarketItem[] memory items = new MarketItem[](unsoldItemCount);
-
-        for (uint i = 1; i <= itemCount; i++) {
-            if (idMarketItem[i].owner == address(this)) {
-                items[currentIndex] = idMarketItem[i];
-                currentIndex += 1;
+        MarketItem[] memory items = new MarketItem[](unsoldCount);
+        for (uint i = 1; i <= totalCount; i++) {
+            if (idToMarketItem[i].owner == address(this)) {
+                items[currentIndex] = idToMarketItem[i];
+                currentIndex++;
             }
         }
-
         return items;
     }
 
     function fetchMyNFTs() public view returns (MarketItem[] memory) {
         uint totalCount = _tokenIds.current();
-        uint itemCount = 0;
-        uint currentIndex = 0;
+        uint count = 0;
+        uint index = 0;
 
         for (uint i = 1; i <= totalCount; i++) {
-            if (idMarketItem[i].owner == msg.sender) {
-                itemCount += 1;
+            if (idToMarketItem[i].owner == msg.sender) {
+                count++;
             }
         }
 
-        MarketItem[] memory items = new MarketItem[](itemCount);
+        MarketItem[] memory items = new MarketItem[](count);
         for (uint i = 1; i <= totalCount; i++) {
-            if (idMarketItem[i].owner == msg.sender) {
-                items[currentIndex] = idMarketItem[i];
-                currentIndex += 1;
+            if (idToMarketItem[i].owner == msg.sender) {
+                items[index] = idToMarketItem[i];
+                index++;
             }
         }
-
         return items;
     }
 
     function fetchItemsListed() public view returns (MarketItem[] memory) {
         uint totalCount = _tokenIds.current();
-        uint itemCount = 0;
-        uint currentIndex = 0;
+        uint count = 0;
+        uint index = 0;
 
         for (uint i = 1; i <= totalCount; i++) {
-            if (idMarketItem[i].seller == msg.sender) {
-                itemCount += 1;
+            if (idToMarketItem[i].seller == msg.sender) {
+                count++;
             }
         }
 
-        MarketItem[] memory items = new MarketItem[](itemCount);
+        MarketItem[] memory items = new MarketItem[](count);
         for (uint i = 1; i <= totalCount; i++) {
-            if (idMarketItem[i].seller == msg.sender) {
-                items[currentIndex] = idMarketItem[i];
-                currentIndex += 1;
+            if (idToMarketItem[i].seller == msg.sender) {
+                items[index] = idToMarketItem[i];
+                index++;
             }
         }
-
         return items;
     }
 
     // Prevent transfer of soulbound tokens
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override {
         if (from != address(0)) {
-            require(!idMarketItem[tokenId].isSoulBound, "Soulbound NFT cannot be transferred");
+            require(!idToMarketItem[tokenId].isSoulBound, "Soulbound NFTs are non-transferable");
         }
         super._beforeTokenTransfer(from, to, tokenId);
     }
