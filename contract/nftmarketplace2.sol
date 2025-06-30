@@ -14,7 +14,7 @@ contract NFTMarketplace is ERC721URIStorage {
     uint public listingPrice = 0.0025 ether;
     address payable public owner;
 
-    enum Category { Project, Internship, Certificate, Hackathon }
+    enum Category { Project, Internship, Certificate, Hackathon, ResearchPaper }
 
     struct MarketItem {
         uint tokenId;
@@ -58,7 +58,8 @@ contract NFTMarketplace is ERC721URIStorage {
     function createToken(
         string memory tokenURI,
         uint price,
-        Category category
+        Category category,
+        bool isSoulBound  // 👈 user-defined now
     ) public payable returns (uint) {
         require(price > 0, "Price must be > 0");
         require(msg.value == listingPrice, "Pay listing fee");
@@ -69,7 +70,6 @@ contract NFTMarketplace is ERC721URIStorage {
         _mint(msg.sender, newTokenId);
         _setTokenURI(newTokenId, tokenURI);
 
-        bool isSoulBound = (category == Category.Internship || category == Category.Certificate);
         _createMarketItem(newTokenId, price, isSoulBound, category);
 
         return newTokenId;
@@ -190,7 +190,7 @@ contract NFTMarketplace is ERC721URIStorage {
         return items;
     }
 
-    // Block transfer of soulbound tokens
+    // Prevent transfer of soulbound tokens
     function _beforeTokenTransfer(address from, address to, uint256 tokenId) internal override {
         if (from != address(0)) {
             require(!idMarketItem[tokenId].isSoulBound, "Soulbound NFT cannot be transferred");
