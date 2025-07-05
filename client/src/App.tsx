@@ -6,6 +6,7 @@ import AboutUs from './pages/AboutUs'
 import LoginCard from './components/auth/login'
 import SignupCard from './components/auth/signup'
 import VerifyEmail from './pages/VerifyEmail'
+import CreateNfts from './pages/CreateNft'
 
 function App() {
 
@@ -19,6 +20,7 @@ function App() {
         <Route path="/login" element={<LoginCard/>}></Route>
         <Route path="/signup" element={<SignupCard/>}></Route>
         <Route path="/verify-email" element={<VerifyEmail/>}></Route>
+        <Route path="/create-nft" element={<CreateNfts/>}></Route>
       </Routes>
     </div>
     </>
