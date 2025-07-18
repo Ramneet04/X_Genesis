@@ -88,10 +88,13 @@ const Navbar = () => {
             </Link>
           </div>
 
-          <a href="#" className="flex items-center gap-1 text-gray-300 hover:text-white font-medium transition-colors">
-            <Globe className="w-4 h-4" />
-            <span>Community</span>
-          </a>
+         <Link
+  to="/create-organization"
+  className="flex items-center gap-1 text-gray-300 hover:text-white font-medium transition-colors"
+>
+  <PlusCircle className="w-4 h-4" />
+  <span>Join Us</span>
+</Link>
         </div>
 
         {/* Right Side */}
