@@ -14,9 +14,13 @@ import { useState, useMemo } from "react";
 import { useNavigate } from 'react-router-dom'; // Assuming you use react-router-dom for navigation
 import { getContractInstance } from "@/utils/getContract";
 import toast from "react-hot-toast";
+import axios from "axios";
+import { useAppSelector } from "@/main";
 
 const CreateNfts: React.FC = () => {
   const navigate = useNavigate(); // Initialize navigate
+  const {user, token} = useAppSelector((state) => state.user);
+  const {walletAddress, chainId} = useAppSelector((state) => state.wallet);
   // --- State Management for form fields ---
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -29,7 +33,7 @@ const CreateNfts: React.FC = () => {
   const [verifiedBy, setVerifiedBy] = useState<string>("Self");
   const [organization, setOrganization] = useState<string>(""); // For user-entered organization if not in list
   const [selectedOrgFromList, setSelectedOrgFromList] = useState<string>(""); // For selected organization from predefined list
-  const [contributors, setContributors] = useState([{ userId: '', role: '' }]);
+  const [contributors, setContributors] = useState([{ email: '', role: '' }]);
   const [ contract, setContract] = useState<any>(null);
   // Derived state for the actual organization value to send to backend
   const actualOrganizationValue = useMemo(() => {
@@ -42,7 +46,7 @@ const CreateNfts: React.FC = () => {
   }, [verifiedBy, selectedOrgFromList, organization]);
 
   const addContributor = () => {
-    setContributors([...contributors, { userId: '', role: '' }]);
+    setContributors([...contributors, { email: '', role: '' }]);
   };
 
   const removeContributor = (index: number) => {
@@ -51,7 +55,7 @@ const CreateNfts: React.FC = () => {
   };
 
   // --- Data for Selects/Radios ---
-  const categoriesOptions = ["Project", "Internship", "Certificate", "Hackathon", "Research Paper", "Open Source", "Resume", "Other"];
+  const categoriesOptions = ["Project", "Internship", "Certificate", "Hackathon", "Research Paper", "Open Source", "Resume", "Skill"];
   const verifiedByOptions = ["Self", "Organization/Institution"];
 
   // Pre-defined organizations for dropdown
@@ -69,15 +73,16 @@ const CreateNfts: React.FC = () => {
   // Placeholder for pre-defined avatars with categories
   const preDefinedAvatars = [
     { id: 1, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750954071/Gemini_Generated_Image_8z1gon8z1gon8z1g_t7icqt.png`, alt: `Project Avatar 1`, category: "Project" },
-    { id: 2, src: `https://source.unsplash.com/random/80x80/?learning,internship`, alt: `Internship Avatar 1`, category: "Internship" },
+    { id: 2, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750961882/Gemini_Generated_Image_o62qn1o62qn1o62q_a8w9uy.png`, alt: `Internship Avatar 1`, category: "Internship" },
     { id: 3, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750954071/Gemini_Generated_Image_8z1gon8z1gon8z1g_t7icqt.png`, alt: `Certificate Avatar 1`, category: "Certificate" },
-    { id: 4, src: `https://source.unsplash.com/random/80x80/?hackathon,coding`, alt: `Hackathon Avatar 1`, category: "Hackathon" },
-    { id: 5, src: `https://source.unsplash.com/random/80x80/?research,science`, alt: `Research Paper Avatar 1`, category: "Research Paper" },
-    { id: 6, src: `https://source.unsplash.com/random/80x80/?opensource,github`, alt: `Open Source Avatar 1`, category: "Open Source" },
-    { id: 7, src: `https://source.unsplash.com/random/80x80/?resume,profile`, alt: `Resume Avatar 1`, category: "Resume" },
-    { id: 8, src: `https://source.unsplash.com/random/80x80/?abstract,geometric`, alt: `Other Avatar 1`, category: "Other" },
+    { id: 4, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750954071/Gemini_Generated_Image_8z1gon8z1gon8z1g_t7icqt.png`, alt: `Hackathon Avatar 1`, category: "Hackathon" },
+    { id: 5, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750961601/Gemini_Generated_Image_pkc1fgpkc1fgpkc1_f5nzyo.png`, alt: `Research Paper Avatar 1`, category: "Research Paper" },
+    { id: 6, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750954071/Gemini_Generated_Image_8z1gon8z1gon8z1g_t7icqt.png`, alt: `Open Source Avatar 1`, category: "Open Source" },
+    { id: 7, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750961548/Gemini_Generated_Image_fn17w6fn17w6fn17_zwg84r.png`, alt: `Resume Avatar 1`, category: "Resume" },
+    { id: 8, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1762185179/Gemini_Generated_Image_4zag6s4zag6s4zag_h581wv.png`, alt: `Skill Avatar 1`, category: "Skill" },
     { id: 9, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750954071/Gemini_Generated_Image_8z1gon8z1gon8z1g_t7icqt.png`, alt: `Project Avatar 2`, category: "Project" },
-    { id: 10, src: `https://source.unsplash.com/random/80x80/?business,meeting`, alt: `Internship Avatar 2`, category: "Internship" },
+    { id: 10, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750961248/Gemini_Generated_Image_6ztzvv6ztzvv6ztz_cvxbfu.png`, alt: `Internship Avatar 2`, category: "Internship" },
+    { id: 11, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750961230/Gemini_Generated_Image_4qrb3q4qrb3q4qrb_oav7kw.png`, alt: `Skill Avatar 2`, category: "Skill" },
   ];
   const [selectedAvatar, setSelectedAvatar] = useState<number | null>(preDefinedAvatars[0]?.id || null);
 
@@ -92,17 +97,16 @@ const CreateNfts: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const selectedAvatarSrc = preDefinedAvatars.find(
-  (avatar) => avatar.id === selectedAvatar
-)?.src;
-    const baseNftData = {
-      title, description, tags, category, fileUrl:selectedAvatarSrc,
-      verifiedBy,
-      organization: actualOrganizationValue, // Use the derived value
-      contributors,
-    };
+       (avatar) => avatar.id === selectedAvatar
+    )?.src;
 
     try {
       if (verifiedBy === "Self") {
+        const baseNftData = {
+         title, description, tags, category, fileUrl:selectedAvatarSrc,
+         verifiedBy,
+         contributors,
+       };
         const toastId=toast.loading("⏳ Minting your NFT... Please confirm the transaction in MetaMask");
         const response = await fetch(selectedAvatarSrc);
         const blob = await response.blob();
@@ -139,7 +143,7 @@ const CreateNfts: React.FC = () => {
                ...(contributors && contributors.length > 0
                  ? contributors.map((c) => ({
                      trait_type: `Contributor (${c.role || "Unknown Role"})`,
-                     value: c.userId || "Unknown User",
+                     value: c.email || "Unknown User",
                    }))
                  : []),
              ],
@@ -161,52 +165,69 @@ const CreateNfts: React.FC = () => {
           const contractInstance = await getContractInstance();
           setContract(contractInstance);
           console.log(contractInstance);
-          
+          let receiptInstance;
          try {
               const tx = await contract.safeMint(metaIpfsUrl);
               const receipt = await tx.wait();
-              
+              receiptInstance=receipt;
               if (!receipt?.hash) {
                 throw new Error("Transaction receipt missing!");
               }
-              
+              toast.dismiss(toastId);
               console.log("✅ Minted successfully:", receipt.hash);
               toast.success(`Minted successfully: ${receipt.hash.slice(0, 10)}...`);
-              toast.dismiss(toastId);
 
             }catch (error) {
               console.error("❌ Minting failed:", error);
               toast.dismiss(toastId);
               toast.error(`Minting failed: ${error.message}`);
-            }            
-            
-          // const response = await fetch('/api/mint-nft-self', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(nftData) });
-          // const result = await response.json();
-        // Assuming backend returns transaction hash or direct NFT ID
-        // const mockResponse = { success: true, transactionHash: "0xabc123...", nftId: "mock_self_nft_123" }; // Mock data
-        // if (result.success) {
-        //   alert("NFT creation initiated! Check console for transaction hash.");
-        //   navigate(`/nft-status/${result.transactionHash || result.nftId}`); // Redirect to status page
-        // } else {
-        //   alert(`Failed to create NFT: ${result.message || 'Unknown error'}`);
-        // }
+            }
+            const transferEvent = receiptInstance.logs
+                .map((log) => {
+                  try {
+                    return contract.interface.parseLog(log);
+                  } catch {
+                    return null;
+                  }
+                })
+                .find((parsed) => parsed && parsed.name === "Transfer");
+ 
+            const tokenId = transferEvent?.args?.tokenId?.toString();
+            console.log(tokenId);        
+            await axios.post(
+               `${import.meta.env.VITE_API_BASE_URL}/nft/create`,
+               {
+                 ...baseNftData,
+                 fileUrl: imageGateway,
+                 metadataUrl: metaGatewayUrl,
+                 walletAddress:walletAddress,
+                 tokenId,
+                 transactionHash: receiptInstance.hash,
+                 chainId,
+               },
+               {
+                 headers: {
+                   "Content-Type": "application/json",
+                   Authorization: `Bearer ${token}`, // if using JWT
+                 },
+               }
+             );
+             toast.dismiss(toastId);    
       } else { // Organization/Institution
-        const nftRequestData = {
-          ...baseNftData,
-          // requestedAt will be set by the backend using Date.now()
-        };
-        console.log("Submitting NFT request for organization approval:", nftRequestData);
-        // Simulate API call to your backend to submit for approval
-        const response = await fetch('/api/submit-nft-for-approval', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(nftRequestData) });
-        const result = await response.json();
-        // Assuming backend returns a requestId
-        // const mockResponse = { success: true, requestId: "req_org_xyz_456" }; // Mock data
-        if (result.success) {
-          alert("NFT creation request submitted for organization approval!");
-          navigate(`/my-requests/${result.requestId}`); // Redirect to a page showing pending requests
-        } else {
-          alert(`Failed to submit request: ${result.message || 'Unknown error'}`);
-        }
+        // const nftRequestData = {
+        //   ...baseNftData,
+        //   // requestedAt will be set by the backend using Date.now()
+        // };
+        // console.log("Submitting NFT request for organization approval:", nftRequestData);
+        // // Simulate API call to your backend to submit for approval
+        // // Assuming backend returns a requestId
+        // // const mockResponse = { success: true, requestId: "req_org_xyz_456" }; // Mock data
+        // if (result.success) {
+        //   alert("NFT creation request submitted for organization approval!");
+        //   navigate(`/my-requests/${result.requestId}`); // Redirect to a page showing pending requests
+        // } else {
+        //   alert(`Failed to submit request: ${result.message || 'Unknown error'}`);
+        // }
       }
     } catch (error) {
       console.error("Error in NFT process:", error);
@@ -395,12 +416,12 @@ const CreateNfts: React.FC = () => {
                   </SelectContent>
                 </Select>
 
-                <div className="grid grid-cols-4 gap-4 p-4 rounded-lg bg-slate-950 border border-gray-500 shadow-inner shadow-black/30 max-h-80 overflow-y-auto custom-scrollbar">
+                <div className="grid grid-cols-4 gap-4 p-4 rounded-xl bg-slate-950 border border-gray-500 shadow-inner shadow-black/30 max-h-80 overflow-y-auto custom-scrollbar">
                   {filteredAvatars.length > 0 ? (
                     filteredAvatars.map((avatar) => (
                       <div
                         key={avatar.id}
-                        className={`relative w-20 h-20 rounded-lg overflow-hidden cursor-pointer transition-all duration-200
+                        className={`relative w-20 h-20 rounded-xl overflow-hidden cursor-pointer transition-all duration-200
                           ${selectedAvatar === avatar.id ? 'ring-2 ring-offset-2 ring-offset-zinc-600 ring-blue-400 shadow-lg shadow-blue-400/40 animate-pulse-border' : 'hover:ring-1 hover:ring-gray-500'}
                         `}
                         onClick={() => setSelectedAvatar(avatar.id)}
@@ -423,10 +444,10 @@ const CreateNfts: React.FC = () => {
                   <div key={index} className="flex space-x-2 mb-2 items-center">
                     <Input
                       placeholder="Contributor User ID/Address"
-                      value={contributor.userId}
+                      value={contributor.email}
                       onChange={(e) => {
                         const newCont = [...contributors];
-                        newCont[index].userId = e.target.value;
+                        newCont[index].email = e.target.value;
                         setContributors(newCont);
                       }}
                       className="flex-grow rounded-2xl bg-slate-950 border-gray-500 text-white shadow-md shadow-black/20"

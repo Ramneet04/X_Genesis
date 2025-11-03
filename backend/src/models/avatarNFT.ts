@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 
 const avatarNFTSchema = new mongoose.Schema({
-    tag:{
+    category:{
         type:String,
     },
     image:{

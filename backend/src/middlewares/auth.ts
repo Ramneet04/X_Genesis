@@ -3,9 +3,13 @@ import jwt from "jsonwebtoken";
 import "dotenv/config";
 import User from "../models/user";
 
-export const auth = async (req:Request, res:Response, next: NextFunction)=>{
+export const auth = async (req:any, res:any, next: any)=>{
     try {
-        const token = req.body || req.cookies.token || req.header("Authorization")?.replace("Bearer ", "");
+        const token =
+  req.cookies?.token ||
+  req.header("Authorization")?.replace("Bearer ", "") ||
+  req.body?.token;
+
         if(!token){
             return res.status(401).json({message:"Unauthorized", success:false});
         }
@@ -31,7 +35,7 @@ export const auth = async (req:Request, res:Response, next: NextFunction)=>{
         })
     }
 }
-export const isUser = async (req:Request,res:Response,next: NextFunction)=>{
+export const isUser = async (req:any,res:any,next:any)=>{
     try {
         const  {email} = (req as any).user;
         const userDetails = await User.findOne({email});

@@ -1,3 +1,6 @@
 import { Router } from "express";
-
-export const nftsRouter = Router();
+import { createNft } from "../../controllers/nfts";
+import { auth, isUser } from "../../middlewares/auth";
+const router: Router = Router();
+router.post("/create",auth,isUser,createNft);
+export default router;

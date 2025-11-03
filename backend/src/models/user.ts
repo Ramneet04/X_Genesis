@@ -38,12 +38,6 @@ const UserSchema = new mongoose.Schema(
       default: null
     },
 
-    // Web3 Wallet
-    walletAddress: {
-      type: String,
-      default: null,
-    },
-
     // User Type
     role: {
       type: String,

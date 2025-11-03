@@ -21,10 +21,11 @@ const NftSchema = new mongoose.Schema({
     type: String,
   },
 
-  tags: [String], // tech stack, skills, etc.
+  tags: [String],
+
   category: {
   type: String,
-  enum: ["Project", "Internship", "Certificate", "Hackathon", "ResearchPaper"],
+  enum: ["Project", "Internship", "Certificate", "Hackathon", "ResearchPaper", "OpenSource", "Resume", "Skill"],
   },
 
 
@@ -40,7 +41,7 @@ const NftSchema = new mongoose.Schema({
 
   verifiedBy: {
     type: String,
-    enum: ["Self", "AI", "Institute", "Both"],
+    enum: ["Self", "AI", "Organization"],
     default: "Self",
   },
   organization: {
@@ -52,6 +53,15 @@ const NftSchema = new mongoose.Schema({
   tokenId: {
     type: Number,    
     default: null,
+  },
+  walletAddress:{
+    type: String,
+  },
+  transactionHash:{
+    type: String,
+  },
+  chainId:{
+    type: Number,
   },
 
   isListed: {
@@ -72,21 +82,21 @@ const NftSchema = new mongoose.Schema({
     },
     role: String, // Optional: "Lead", "Developer", "Designer", etc.
   }
-],
-visibility: {
-  type: String,
-  enum: ["Public", "Private"],
-  default: "Public"
-},
-price: {
-  type: Number, // or String if in crypto
-  default: null,
-},
-currency: {
-  type: String,
-  enum: ["MATIC", "ETH", "USDT"],
-  default: "ETH",
-}
+  ],
+  visibility: {
+    type: String,
+    enum: ["Public", "Private"],
+    default: "Public"
+  },
+  price: {
+    type: Number, // or String if in crypto
+    default: 0,
+  },
+  currency: {
+    type: String,
+    enum: ["MATIC", "ETH", "USDT"],
+    default: "ETH",
+  }
 
 })
 

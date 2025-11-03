@@ -4,9 +4,10 @@ import Like from "../models/likes";
 import Rating from "../models/ratings";
 import endorsement from "../models/endorsement";
 
-export const createNft = async (req:Request, res:Response) => {
+export const createNft = async (req:any, res:any) => {
   try {
-    const {
+    console.log("testtiisjkjdnsdndsj");
+    let {
       title,
       description,
       tags,
@@ -16,15 +17,22 @@ export const createNft = async (req:Request, res:Response) => {
       verifiedBy = "Self",
       organization = null,
       contributors = [],
-      visibility = "Public",
-      forSale,
-      price,
-      currentOwner
+      walletAddress,
+      tokenId,
+      transactionHash,
+      chainId
     } = req.body;
-
+    if (!title || !description || !fileUrl || !metadataUrl) {
+       return res.status(400).json({ success: false, message: "Missing required fields." });
+    }
+    contributors=[];
     const nft = await Nft.create({
       userId: (req as any).user.id,
       currentOwner: (req as any).user.id,
+      walletAddress,
+      transactionHash,
+      chainId,
+      tokenId,
       title,
       description,
       tags,
@@ -34,10 +42,7 @@ export const createNft = async (req:Request, res:Response) => {
       verifiedBy,
       organization: verifiedBy === "Self" ? null : organization,
       contributors,
-      visibility,
       mintedAt: new Date(),
-      forSale,
-      price: forSale === true ? price : null
     });
 
     res.status(201).json({ success: true, data: nft });

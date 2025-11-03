@@ -8,6 +8,7 @@ import SignupCard from './components/auth/signup'
 import VerifyEmail from './pages/VerifyEmail'
 import CreateNfts from './pages/CreateNft'
 import OrganizationRegistrationForm from './pages/Organizations'
+import Dashboard from './pages/Dashbaord'
 
 function App() {
 
@@ -23,6 +24,7 @@ function App() {
         <Route path="/verify-email" element={<VerifyEmail/>}></Route>
         <Route path="/create-nft" element={<CreateNfts/>}></Route>
         <Route path="/create-organization" element={<OrganizationRegistrationForm/>}></Route>
+        <Route path="/dashboard" element={<Dashboard/>}></Route>
       </Routes>
     </div>
     </>
