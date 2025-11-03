@@ -4,7 +4,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 
@@ -13,27 +12,25 @@ import { IoImageOutline, IoCubeOutline, IoAddCircleOutline } from "react-icons/i
 import { FileUp } from "lucide-react";
 import { useState, useMemo } from "react";
 import { useNavigate } from 'react-router-dom'; // Assuming you use react-router-dom for navigation
+import { getContractInstance } from "@/utils/getContract";
+import toast from "react-hot-toast";
 
 const CreateNfts: React.FC = () => {
   const navigate = useNavigate(); // Initialize navigate
-
   // --- State Management for form fields ---
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
-  const [tags, setTags] = useState<string>("");
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState<string>("");
+  const [imgHash,setImgHash] = useState<string>("");
+  const [metaHash,setMetaHash] = useState<string>("");
+
   const [category, setCategory] = useState<string>("Project");
-  const [fileUrl, setFileUrl] = useState<string>("");
   const [verifiedBy, setVerifiedBy] = useState<string>("Self");
   const [organization, setOrganization] = useState<string>(""); // For user-entered organization if not in list
   const [selectedOrgFromList, setSelectedOrgFromList] = useState<string>(""); // For selected organization from predefined list
-  const [isSoulBound, setIsSoulBound] = useState<boolean>(false);
-  // Removed submissionTime state as it will be handled by the backend
-  const [forSale, setForSale] = useState<boolean>(false);
-  const [price, setPrice] = useState<number | null>(null);
-  const [currency, setCurrency] = useState<string>("MATIC");
-  const [visibility, setVisibility] = useState<string>("Public");
   const [contributors, setContributors] = useState([{ userId: '', role: '' }]);
-
+  const [ contract, setContract] = useState<any>(null);
   // Derived state for the actual organization value to send to backend
   const actualOrganizationValue = useMemo(() => {
     if (verifiedBy === "Organization/Institution") {
@@ -56,8 +53,6 @@ const CreateNfts: React.FC = () => {
   // --- Data for Selects/Radios ---
   const categoriesOptions = ["Project", "Internship", "Certificate", "Hackathon", "Research Paper", "Open Source", "Resume", "Other"];
   const verifiedByOptions = ["Self", "Organization/Institution"];
-  const visibilityOptions = ["Public", "Private", "Unlisted"];
-  const currenciesOptions = ["MATIC", "ETH", "USDT", "DAI"];
 
   // Pre-defined organizations for dropdown
   const predefinedOrganizations = [
@@ -73,17 +68,16 @@ const CreateNfts: React.FC = () => {
 
   // Placeholder for pre-defined avatars with categories
   const preDefinedAvatars = [
-    { id: 1, src: `https://source.unsplash.com/random/80x80/?code,project`, alt: `Project Avatar 1`, category: "Project" },
+    { id: 1, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750954071/Gemini_Generated_Image_8z1gon8z1gon8z1g_t7icqt.png`, alt: `Project Avatar 1`, category: "Project" },
     { id: 2, src: `https://source.unsplash.com/random/80x80/?learning,internship`, alt: `Internship Avatar 1`, category: "Internship" },
-    { id: 3, src: `https://source.unsplash.com/random/80x80/?certificate,award`, alt: `Certificate Avatar 1`, category: "Certificate" },
+    { id: 3, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750954071/Gemini_Generated_Image_8z1gon8z1gon8z1g_t7icqt.png`, alt: `Certificate Avatar 1`, category: "Certificate" },
     { id: 4, src: `https://source.unsplash.com/random/80x80/?hackathon,coding`, alt: `Hackathon Avatar 1`, category: "Hackathon" },
     { id: 5, src: `https://source.unsplash.com/random/80x80/?research,science`, alt: `Research Paper Avatar 1`, category: "Research Paper" },
     { id: 6, src: `https://source.unsplash.com/random/80x80/?opensource,github`, alt: `Open Source Avatar 1`, category: "Open Source" },
     { id: 7, src: `https://source.unsplash.com/random/80x80/?resume,profile`, alt: `Resume Avatar 1`, category: "Resume" },
     { id: 8, src: `https://source.unsplash.com/random/80x80/?abstract,geometric`, alt: `Other Avatar 1`, category: "Other" },
-    { id: 9, src: `https://source.unsplash.com/random/80x80/?programming,development`, alt: `Project Avatar 2`, category: "Project" },
+    { id: 9, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750954071/Gemini_Generated_Image_8z1gon8z1gon8z1g_t7icqt.png`, alt: `Project Avatar 2`, category: "Project" },
     { id: 10, src: `https://source.unsplash.com/random/80x80/?business,meeting`, alt: `Internship Avatar 2`, category: "Internship" },
-    // Add more avatars with categories
   ];
   const [selectedAvatar, setSelectedAvatar] = useState<number | null>(preDefinedAvatars[0]?.id || null);
 
@@ -97,33 +91,105 @@ const CreateNfts: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+    const selectedAvatarSrc = preDefinedAvatars.find(
+  (avatar) => avatar.id === selectedAvatar
+)?.src;
     const baseNftData = {
-      title, description, tags, category, fileUrl,
+      title, description, tags, category, fileUrl:selectedAvatarSrc,
       verifiedBy,
       organization: actualOrganizationValue, // Use the derived value
-      isSoulBound, contributors, visibility,
-      forSale, price, currency, selectedAvatar,
+      contributors,
     };
 
     try {
       if (verifiedBy === "Self") {
-        const nftData = {
-          ...baseNftData,
-          // mintedAt will be set by the backend using Date.now()
-        };
-        console.log("Attempting direct mint (Self-verified):", nftData);
-        // Simulate API call to your backend to directly mint
-        const response = await fetch('/api/mint-nft-self', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(nftData) });
-        const result = await response.json();
+        const toastId=toast.loading("⏳ Minting your NFT... Please confirm the transaction in MetaMask");
+        const response = await fetch(selectedAvatarSrc);
+        const blob = await response.blob();
+        const imgForm = new FormData();
+        imgForm.append("file", blob, "image.png");
+        const imgUploadRes = await fetch("https://api.pinata.cloud/pinning/pinFileToIPFS", {
+         method: "POST",
+         headers: {
+           pinata_api_key: import.meta.env.VITE_PINATA_API_KEY,
+           pinata_secret_api_key: import.meta.env.VITE_PINATA_API_SECRET,
+         },
+         body: imgForm, // again, no Content-Type header!
+       });
+
+      const imgData = await imgUploadRes.json();
+      const imageHash = imgData.IpfsHash;
+      const imageIpfs = `ipfs://${imageHash}`;
+      const imageGateway = `https://gateway.pinata.cloud/ipfs/${imageHash}`;
+      setImgHash(imageHash);
+
+      console.log("✅ Image uploaded to IPFS:", imageGateway);
+      const metadata = {
+             name: title,
+             description,
+             image: imageIpfs, // ✅ use HTTPS gateway for visibility
+             tags: tags && tags.length > 0 ? tags : [],
+           
+             attributes: [
+               { trait_type: "Category", value: category },
+               { trait_type: "Verified By", value: verifiedBy },
+               ...(actualOrganizationValue
+                 ? [{ trait_type: "Organization", value: actualOrganizationValue }]
+                 : []),
+               ...(contributors && contributors.length > 0
+                 ? contributors.map((c) => ({
+                     trait_type: `Contributor (${c.role || "Unknown Role"})`,
+                     value: c.userId || "Unknown User",
+                   }))
+                 : []),
+             ],
+          };
+          const metaUploadRes = await fetch("https://api.pinata.cloud/pinning/pinJSONToIPFS", {
+                     method: "POST",
+                     headers: {
+                       Authorization: `Bearer ${import.meta.env.VITE_PINATA_JWT_SECRET}`,
+                       "Content-Type": "application/json",
+                     },
+                     body: JSON.stringify(metadata),
+              });
+          const metaDataJson = await metaUploadRes.json();
+          const metaIpfsUrl = `ipfs://${metaDataJson.IpfsHash}`;
+          const metaGatewayUrl = `https://gateway.pinata.cloud/ipfs/${metaDataJson.IpfsHash}`;
+          setMetaHash(metaDataJson.IpfsHash);
+          console.log("metaData Url uplaoded",metaGatewayUrl);
+
+          const contractInstance = await getContractInstance();
+          setContract(contractInstance);
+          console.log(contractInstance);
+          
+         try {
+              const tx = await contract.safeMint(metaIpfsUrl);
+              const receipt = await tx.wait();
+              
+              if (!receipt?.hash) {
+                throw new Error("Transaction receipt missing!");
+              }
+              
+              console.log("✅ Minted successfully:", receipt.hash);
+              toast.success(`Minted successfully: ${receipt.hash.slice(0, 10)}...`);
+              toast.dismiss(toastId);
+
+            }catch (error) {
+              console.error("❌ Minting failed:", error);
+              toast.dismiss(toastId);
+              toast.error(`Minting failed: ${error.message}`);
+            }            
+            
+          // const response = await fetch('/api/mint-nft-self', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(nftData) });
+          // const result = await response.json();
         // Assuming backend returns transaction hash or direct NFT ID
         // const mockResponse = { success: true, transactionHash: "0xabc123...", nftId: "mock_self_nft_123" }; // Mock data
-        if (result.success) {
-          alert("NFT creation initiated! Check console for transaction hash.");
-          navigate(`/nft-status/${result.transactionHash || result.nftId}`); // Redirect to status page
-        } else {
-          alert(`Failed to create NFT: ${result.message || 'Unknown error'}`);
-        }
+        // if (result.success) {
+        //   alert("NFT creation initiated! Check console for transaction hash.");
+        //   navigate(`/nft-status/${result.transactionHash || result.nftId}`); // Redirect to status page
+        // } else {
+        //   alert(`Failed to create NFT: ${result.message || 'Unknown error'}`);
+        // }
       } else { // Organization/Institution
         const nftRequestData = {
           ...baseNftData,
@@ -214,15 +280,46 @@ const CreateNfts: React.FC = () => {
               </div>
 
               <div>
-                <Label htmlFor="tags" className="text-gray-300 mb-2 block">Tags (comma-separated)</Label>
-                <Input
-                  id="tags"
-                  placeholder="e.g., Web3, Solidity, DeFi, AI"
-                  className="bg-slate-950 rounded-2xl border-gray-500 text-white focus-visible:ring-blue-400 focus-visible:ring-offset-0 focus-visible:border-blue-400 shadow-md shadow-black/20"
-                  value={tags}
-                  onChange={(e) => setTags(e.target.value)}
-                />
-              </div>
+  <Label htmlFor="tags" className="text-gray-300 mb-2 block">Tags</Label>
+  <div className="flex flex-wrap gap-2 mb-2">
+    {tags.map((tag, index) => (
+      <span
+        key={index}
+        className="flex items-center bg-blue-500/20 text-blue-300 border border-blue-400/40 px-3 py-1 rounded-full text-sm shadow-md shadow-blue-900/20"
+      >
+        {tag}
+        <button
+          type="button"
+          onClick={() => setTags(tags.filter((_, i) => i !== index))}
+          className="ml-2 text-blue-300 hover:text-red-400 transition-colors"
+        >
+          ×
+        </button>
+      </span>
+    ))}
+  </div>
+
+  <Input
+    id="tags"
+    placeholder="Type a tag and press Enter or comma"
+    className="bg-slate-950 rounded-2xl border-gray-500 text-white focus-visible:ring-blue-400 focus-visible:ring-offset-0 focus-visible:border-blue-400 shadow-md shadow-black/20"
+    value={tagInput}
+    onChange={(e) => setTagInput(e.target.value)}
+    onKeyDown={(e) => {
+      if ((e.key === "Enter" || e.key === ",") && tagInput.trim()) {
+        e.preventDefault();
+        if (!tags.includes(tagInput.trim())) {
+          setTags([...tags, tagInput.trim()]);
+        }
+        setTagInput("");
+      } else if (e.key === "Backspace" && !tagInput && tags.length > 0) {
+        // Optional: delete last tag on backspace when input empty
+        setTags(tags.slice(0, -1));
+      }
+    }}
+  />
+</div>
+
 
               <div>
                 <Label htmlFor="category" className="text-gray-300 mb-2 block">Category</Label>
@@ -238,23 +335,6 @@ const CreateNfts: React.FC = () => {
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
-
-              <div>
-                <Label htmlFor="fileUrl" className="text-gray-300 mb-2 block">NFT Asset File URL</Label>
-                <div className="flex items-center space-x-2">
-                  <Input
-                    id="fileUrl"
-                    placeholder="Paste IPFS or direct URL for image/video"
-                    className="flex-grow rounded-2xl bg-slate-950 border-gray-500 text-white focus-visible:ring-blue-400 focus-visible:ring-offset-0 focus-visible:border-blue-400 shadow-md shadow-black/20"
-                    value={fileUrl}
-                    onChange={(e) => setFileUrl(e.target.value)}
-                    required
-                  />
-                  <Button type="button" className="shrink-0 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white p-2 rounded-md shadow-lg shadow-blue-400/30">
-                    <FileUp className="h-5 w-5" />
-                  </Button>
-                </div>
               </div>
 
               <div>
@@ -334,16 +414,6 @@ const CreateNfts: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between p-2 rounded-2xl bg-slate-950 border border-gray-500 shadow-md shadow-black/20">
-                <Label htmlFor="isSoulBound" className="text-gray-300 text-base font-medium">Is Soulbound (Non-transferable)</Label>
-                <Switch
-                  id="isSoulBound"
-                  checked={isSoulBound}
-                  onCheckedChange={setIsSoulBound}
-                  className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-purple-500 data-[state=checked]:to-pink-500 data-[state=unchecked]:bg-gray-500"
-                />
-              </div>
-
               {/* Date/Time input and label completely removed as per your request */}
               {/* This section used to display "Minting Date & Time" or "Requested Date & Time" */}
 
@@ -382,62 +452,6 @@ const CreateNfts: React.FC = () => {
                   <IoAddCircleOutline className="mr-2 h-5 w-5" /> Add Contributor
                 </Button>
               </div>
-
-              <div>
-                <Label className="text-gray-300 mb-2 block">Visibility Settings</Label>
-                <RadioGroup value={visibility} onValueChange={setVisibility} className="flex flex-wrap gap-4 p-2 rounded-2xl bg-slate-950 border border-gray-500 shadow-md shadow-black/20">
-                  {visibilityOptions.map((option) => (
-                    <div key={option} className="flex items-center space-x-2">
-                      <RadioGroupItem value={option} id={`visibility-${option}`} className="data-[state=checked]:bg-blue-400 data-[state=checked]:text-white data-[state=checked]:border-blue-400" />
-                      <Label htmlFor={`visibility-${option}`} className="text-gray-400 hover:text-white cursor-pointer">{option}</Label>
-                    </div>
-                  ))}
-                </RadioGroup>
-              </div>
-
-              <div className="flex items-center justify-between p-2 rounded-2xl bg-slate-950 border border-gray-500 shadow-md shadow-black/20">
-                <Label htmlFor="forSale" className="text-gray-300 text-base font-medium">List for Sale</Label>
-                <Switch
-                  id="forSale"
-                  checked={forSale}
-                  onCheckedChange={setForSale}
-                  className="data-[state=checked]:bg-gradient-to-r data-[state=checked]:from-cyan-500 data-[state=checked]:to-teal-500 data-[state=unchecked]:bg-gray-500"
-                />
-              </div>
-
-              {forSale && (
-                <div className="flex space-x-4">
-                  <div className="flex-1">
-                    <Label htmlFor="price" className="text-gray-300 mb-2 block">Sale Price</Label>
-                    <Input
-                      id="price"
-                      type="number"
-                      placeholder="e.g., 1500"
-                      className="bg-slate-950 border-gray-500 text-white focus-visible:ring-blue-400 focus-visible:ring-offset-0 focus-visible:border-blue-400 shadow-md shadow-black/20"
-                      value={price ?? ''}
-                      onChange={(e) => setPrice(parseFloat(e.target.value) || null)}
-                      min="0"
-                      step="0.01"
-                      required={forSale}
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <Label htmlFor="currency" className="text-gray-300 mb-2 block">Currency</Label>
-                    <Select value={currency} onValueChange={setCurrency}>
-                      <SelectTrigger id="currency" className="bg-slate-950 border-gray-500 text-white focus-visible:ring-blue-400 focus-visible:ring-offset-0 shadow-md shadow-black/20">
-                        <SelectValue placeholder="Select currency" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-slate-950 border-gray-500 text-white">
-                        {currenciesOptions.map((curr) => (
-                          <SelectItem key={curr} value={curr} className="hover:bg-zinc-500 focus:bg-blue-500 focus:text-white data-[state=checked]:bg-blue-500 data-[state=checked]:text-white">
-                            {curr}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              )}
             </div>
           </form>
 

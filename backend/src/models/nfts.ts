@@ -50,10 +50,11 @@ const NftSchema = new mongoose.Schema({
 
   // NFT info
   tokenId: {
-    type: Number,
+    type: Number,    
     default: null,
   },
-  isSoulBound: {
+
+  isListed: {
   type: Boolean,
   default: false,
  },
@@ -62,6 +63,7 @@ const NftSchema = new mongoose.Schema({
     type: Date, // When NFT is minted
     default: Date.now(),
   },
+
   contributors: [
   {
     userId: {
@@ -73,12 +75,8 @@ const NftSchema = new mongoose.Schema({
 ],
 visibility: {
   type: String,
-  enum: ["Public", "Private", "Unlisted"],
+  enum: ["Public", "Private"],
   default: "Public"
-},
-forSale: {
-  type: Boolean,
-  default: false,
 },
 price: {
   type: Number, // or String if in crypto
@@ -87,7 +85,7 @@ price: {
 currency: {
   type: String,
   enum: ["MATIC", "ETH", "USDT"],
-  default: "MATIC",
+  default: "ETH",
 }
 
 })
