@@ -191,9 +191,9 @@ const CreateNfts: React.FC = () => {
                   }
                 })
                 .find((parsed) => parsed && parsed.name === "Transfer");
- 
             const tokenId = transferEvent?.args?.tokenId?.toString();
-            console.log(tokenId);        
+            console.log(tokenId); 
+            const toastId2=toast.loading("⏳ Finalizing NFT creation...");       
             await axios.post(
                `${import.meta.env.VITE_API_BASE_URL}/nft/create`,
                {
@@ -212,7 +212,8 @@ const CreateNfts: React.FC = () => {
                  },
                }
              );
-             toast.dismiss(toastId);    
+             toast.dismiss(toastId2);   
+             navigate("/dashboard"); 
       } else { // Organization/Institution
         // const nftRequestData = {
         //   ...baseNftData,
