@@ -1,30 +1,47 @@
 import React, { useEffect, useState } from "react";
-import { useAppSelector } from "@/main";
+import { useAppDispatch, useAppSelector } from "@/main";
 import { Button } from "@/components/ui/button";
-
-interface NFT {
-  _id: string;
-  title: string;
-  description: string;
-  fileUrl: string;
-  listed: boolean;
-}
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import axios from "axios";
+import { apiConnector } from "@/services/apiConnector";
+import { setLoading, setNfts } from "@/slices/nft";
 
 const Dashboard: React.FC = () => {
-  const { user } = useAppSelector((state) => state.user);
+  const { user, token } = useAppSelector((state) => state.user);
   const { address } = useAppSelector((state) => state.wallet);
-  const [nfts, setNfts] = useState<NFT[]>([]);
+  // const [nfts, setNfts] = useState<NFT[]>([]);
+  const {nfts} = useAppSelector((state)=>state.nft);
+  const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    setNfts([
-      { _id: "1", title: "AI Art", description: "Cool generative art", fileUrl: "https://via.placeholder.com/300", listed: true },
-      { _id: "2", title: "Project NFT", description: "My portfolio project", fileUrl: "https://via.placeholder.com/300", listed: false },
-      { _id: "3", title: "Certificate NFT", description: "Completion badge", fileUrl: "https://via.placeholder.com/300", listed: false },
-    ]);
+  useEffect(()=> {
+    const fetchUserNfts = async () => {
+      console.log("hello");
+      dispatch(setLoading(true));
+      try {
+          const response = await apiConnector("GET", `${import.meta.env.VITE_API_BASE_URL}/nft/user-nfts?page=1&limit=10`,null,
+          { Authorization: `Bearer ${token}` }
+          );
+          console.log(response);
+          if (response.data.success) {
+            dispatch(setNfts(response.data.data));
+          }
+      } catch (error) {
+          console.error("Error fetching NFTs:", error);
+      }
+      dispatch(setLoading(false));
+    }
+    fetchUserNfts();
   }, []);
 
-  const listedNfts = nfts.filter((nft) => nft.listed);
-  const unlistedNfts = nfts.filter((nft) => !nft.listed);
+  const listedNfts = nfts.filter((n) => n.isListed);
+  const unlistedNfts = nfts.filter((n) => !n.isListed);
 
   const handleListNft = (id: string) => {
     console.log("Listing NFT:", id);
@@ -33,13 +50,10 @@ const Dashboard: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-950 text-gray-100 py-10 px-6">
       <div className="max-w-6xl mx-auto space-y-10">
-
         {/* PROFILE SECTION */}
-        <section
-          className="bg-gray-900/60 backdrop-blur-xl rounded-2xl border border-gray-800 p-8 flex flex-col md:flex-row items-center gap-8 shadow-lg"
-        >
-          <div className="w-28 h-28 rounded-full bg-gradient-to-br from-purple-500 to-indigo-500 flex items-center justify-center text-3xl font-bold text-white shadow-md">
-            {user?.userName?.charAt(0)?.toUpperCase() || "U"}
+        <section className="bg-gray-900/60 backdrop-blur-xl rounded-2xl border border-gray-800 p-8 flex flex-col md:flex-row items-center gap-8 shadow-lg">
+          <div className="w-28 h-28 rounded-full flex items-center justify-center text-3xl font-bold text-white shadow-md">
+              <img src={user?.profileImage} alt="" className="h-full w-full rounded-full object-cover" />
           </div>
 
           <div className="flex-1">
@@ -65,25 +79,49 @@ const Dashboard: React.FC = () => {
           </h3>
 
           {listedNfts.length === 0 ? (
-            <p className="text-gray-500 italic">No NFTs listed yet.</p>
+            <p className="text-gray-600 rounded-xl italic">No NFTs listed yet.</p>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {listedNfts.map((nft) => (
-                <div
-                  key={nft._id}
-                  className="bg-gray-900/60 border border-gray-800 rounded-2xl overflow-hidden shadow-md hover:shadow-indigo-500/20 transition-all"
-                >
-                  <img
-                    src={nft.fileUrl}
-                    alt={nft.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="p-4 space-y-2">
-                    <h4 className="text-lg font-semibold">{nft.title}</h4>
-                    <p className="text-gray-400 text-sm">{nft.description}</p>
-                    <div className="text-green-400 font-medium pt-1">Listed ✅</div>
-                  </div>
-                </div>
+                <Dialog key={nft._id}>
+                  <DialogTrigger asChild>
+                    <div className="cursor-pointer bg-gray-900/60 border border-gray-800 rounded-2xl overflow-hidden shadow-md hover:shadow-green-500/20 transition-all">
+                      <div>
+                        <img src={nft.fileUrl} alt={nft.title} className="w-full h-48 object-center" />
+                      </div>
+                      <div className="p-4 space-y-2">
+                        <h4 className="text-lg font-semibold">{nft.title}</h4>
+                        <p className="text-gray-400 text-sm line-clamp-2">{nft.description}</p>
+                        <div className="text-green-400 font-medium pt-1">Listed ✅</div>
+                      </div>
+                    </div>
+                  </DialogTrigger>
+
+                  {/* NFT DETAIL POPUP */}
+                  <DialogContent className="max-w-lg bg-gray-900 border border-gray-700 text-gray-100  rounded-2xl shadow-xl">
+                    <DialogHeader>
+                      <DialogTitle className="text-2xl font-bold">{nft.title}</DialogTitle>
+                      <DialogDescription>{nft.category}</DialogDescription>
+                    </DialogHeader>
+
+                    <img
+                      src={nft.fileUrl}
+                      alt={nft.title}
+                      className="w-full h-64 object-cover rounded-xl my-4"
+                    />
+
+                    <div className="space-y-2 text-sm">
+                      <p><strong>Description:</strong> {nft.description}</p>
+                      <p><strong>Verified By:</strong> {nft.verifiedBy}</p>
+                      <p><strong>Owner:</strong> {nft.walletAddress}</p>
+                      <p><strong>Transaction:</strong> {nft.transactionHash.slice(0, 12)}...</p>
+                      <p><strong>Chain ID:</strong> {nft.chainId}</p>
+                      <p><strong>Visibility:</strong> {nft.visibility}</p>
+                      <p><strong>Price:</strong> {nft.price} {nft.currency}</p>
+                      <p><strong>Minted At:</strong> {new Date(nft.mintedAt).toLocaleString()}</p>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               ))}
             </div>
           )}
@@ -100,26 +138,51 @@ const Dashboard: React.FC = () => {
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {unlistedNfts.map((nft) => (
-                <div
-                  key={nft._id}
-                  className="bg-gray-900/60 border border-gray-800 rounded-2xl overflow-hidden shadow-md hover:shadow-yellow-500/20 transition-all"
-                >
-                  <img
-                    src={nft.fileUrl}
-                    alt={nft.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="p-4 space-y-3">
-                    <h4 className="text-lg font-semibold">{nft.title}</h4>
-                    <p className="text-gray-400 text-sm">{nft.description}</p>
-                    <Button
-                      onClick={() => handleListNft(nft._id)}
-                      className="w-full bg-yellow-600 hover:bg-yellow-500 text-white rounded-xl transition-all"
-                    >
-                      List NFT
-                    </Button>
-                  </div>
-                </div>
+                <Dialog key={nft._id}>
+                  <DialogTrigger asChild>
+                    <div className="cursor-pointer bg-gray-900/60 border border-gray-800 rounded-2xl overflow-hidden shadow-md hover:shadow-yellow-500/20 transition-all">
+                      <div className="h-[220px] rounded-xl">
+                        <img src={nft.fileUrl} alt={nft.title} className="w-full h-full" />
+                      </div>
+                      <div className="p-4 space-y-2">
+                        <h4 className="text-lg font-semibold">{nft.title}</h4>
+                        <p className="text-gray-400 text-sm line-clamp-2">{nft.description}</p>
+                        <Button
+                          onClick={() => handleListNft(nft._id)}
+                          className="w-full bg-yellow-600 hover:bg-yellow-500 text-white rounded-xl transition-all"
+                        >
+                          List NFT
+                        </Button>
+                      </div>
+                    </div>
+                  </DialogTrigger>
+
+                  {/* NFT DETAIL POPUP */}
+                  <DialogContent className="max-w-lg bg-gray-900 border border-gray-700 text-gray-100 rounded-2xl shadow-xl">
+                    <DialogHeader>
+                      <DialogTitle className="text-2xl font-bold">{nft.title}</DialogTitle>
+                      <DialogDescription>{nft.category}</DialogDescription>
+                    </DialogHeader>
+
+                    <div className="h-[280px] mb-4" >
+                      <img
+                      src={nft.fileUrl}
+                      alt={nft.title}
+                      className="w-full h-full object-center rounded-xl"
+                    />
+                    </div>
+
+                    <div className="space-y-2 text-sm">
+                      <p><strong>Description:</strong> {nft.description}</p>
+                      <p><strong>Verified By:</strong> {nft.verifiedBy}</p>
+                      <p><strong>Owner:</strong> {nft.walletAddress}</p>
+                      <p><strong>Transaction:</strong> {nft.transactionHash.slice(0, 12)}...</p>
+                      <p><strong>Chain ID:</strong> {nft.chainId}</p>
+                      <p><strong>Visibility:</strong> {nft.visibility}</p>
+                      <p><strong>Minted At:</strong> {new Date(nft.mintedAt).toLocaleString()}</p>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               ))}
             </div>
           )}

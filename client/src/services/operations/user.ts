@@ -79,9 +79,10 @@ export function login(email:string, password:string, navigate:(path:string)=>voi
             const userImage = response.data?.user?.profileImage ? response.data.user.profileImage : 
             `https://api.dicebear.com/5.x/initials/svg?seed=${response.data.user.userName}`;
             dispatch(setUser({ ...response.data.user, profileImage:userImage}));
+            console.log("token-->",response.data.token);
             localStorage.setItem("token",  JSON.stringify(response.data.token));
             localStorage.setItem("user",  JSON.stringify({...response.data.user, profileImage:userImage}));
-            navigate("/dashboard/my-profile")
+            navigate("/dashboard")
         } catch (error) {
             console.log(error);
             toast.dismiss(toasId);

@@ -5,13 +5,14 @@ import User from "../models/user";
 
 export const auth = async (req:any, res:any, next: any)=>{
     try {
+        console.log("hi");
         const token =
   req.cookies?.token ||
   req.header("Authorization")?.replace("Bearer ", "") ||
   req.body?.token;
-
+  console.log(token);
         if(!token){
-            return res.status(401).json({message:"Unauthorized", success:false});
+            return res.status(401).json({message:"Unauthorised", success:false});
         }
 
         try {
@@ -26,17 +27,20 @@ export const auth = async (req:any, res:any, next: any)=>{
                 message: "Invalid token",
                 success: false
             })
+
         }
-        next();
     } catch (error) {
         return res.status(500).json({
             message: "Something went wrong while Validatig the token",
             success: false
         })
     }
+    console.log("fine");
+    next();
 }
 export const isUser = async (req:any,res:any,next:any)=>{
     try {
+        console.log("hi");
         const  {email} = (req as any).user;
         const userDetails = await User.findOne({email});
         if(!userDetails){

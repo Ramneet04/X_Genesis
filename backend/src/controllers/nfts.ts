@@ -179,18 +179,22 @@ export const getAllNft = async (req:Request, res:Response)=>{
   }
 };
 
-export const getUsersNfts = async(req:Request, res:Response)=>{
+export const getUsersNfts = async(req:any, res:any)=>{
   try {
+    console.log("test");
     const page = parseInt(req.query.page as string) || 1;
+    console.log(page);
     const limit = parseInt(req.query.limit as string) || 20;
     const skip = (page-1) * limit;
     const userId = (req as any).user.id;
-    const nfts = await Nft.find({ userId })
+    console.log(userId);
+    const nfts = await Nft.find({ userId:userId })
     .skip(skip)
     .limit(limit)
-    .populate("organization", "name")
-    .populate("contributors.userId", "userName email walletAddress")
-    .sort({ mintedAt: -1 });
+    // .populate("organization", "name")
+    // .populate("contributors.userId", "userName email walletAddress")
+    // .sort({ mintedAt: -1 });
+    console.log("hiiiiiii");
 
   const nftData = await Promise.all(
       nfts.map(async(nft)=>{

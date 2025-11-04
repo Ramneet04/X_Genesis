@@ -111,7 +111,7 @@ export const login = async (req:any, res:any)=>{
             { id: user._id, email: user.email, role: user.role },
             process.env.JWT_SECRET,
             {
-                expiresIn: "24h",
+                expiresIn: "30d",
             }
         )
         const userData = user.toObject() as any;

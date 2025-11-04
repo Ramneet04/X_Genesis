@@ -16,11 +16,12 @@ import { getContractInstance } from "@/utils/getContract";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { useAppSelector } from "@/main";
+import { apiConnector } from "@/services/apiConnector";
 
 const CreateNfts: React.FC = () => {
   const navigate = useNavigate(); // Initialize navigate
   const {user, token} = useAppSelector((state) => state.user);
-  const {walletAddress, chainId} = useAppSelector((state) => state.wallet);
+  const {address, chainId} = useAppSelector((state) => state.wallet);
   // --- State Management for form fields ---
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -72,7 +73,7 @@ const CreateNfts: React.FC = () => {
 
   // Placeholder for pre-defined avatars with categories
   const preDefinedAvatars = [
-    { id: 1, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750954071/Gemini_Generated_Image_8z1gon8z1gon8z1g_t7icqt.png`, alt: `Project Avatar 1`, category: "Project" },
+    { id: 1, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1762283041/Gemini_Generated_Image_qppojyqppojyqppo_xayvvg.png`, alt: `Project Avatar 1`, category: "Project" },
     { id: 2, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750961882/Gemini_Generated_Image_o62qn1o62qn1o62q_a8w9uy.png`, alt: `Internship Avatar 1`, category: "Internship" },
     { id: 3, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750954071/Gemini_Generated_Image_8z1gon8z1gon8z1g_t7icqt.png`, alt: `Certificate Avatar 1`, category: "Certificate" },
     { id: 4, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750954071/Gemini_Generated_Image_8z1gon8z1gon8z1g_t7icqt.png`, alt: `Hackathon Avatar 1`, category: "Hackathon" },
@@ -80,7 +81,7 @@ const CreateNfts: React.FC = () => {
     { id: 6, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750954071/Gemini_Generated_Image_8z1gon8z1gon8z1g_t7icqt.png`, alt: `Open Source Avatar 1`, category: "Open Source" },
     { id: 7, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750961548/Gemini_Generated_Image_fn17w6fn17w6fn17_zwg84r.png`, alt: `Resume Avatar 1`, category: "Resume" },
     { id: 8, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1762185179/Gemini_Generated_Image_4zag6s4zag6s4zag_h581wv.png`, alt: `Skill Avatar 1`, category: "Skill" },
-    { id: 9, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750954071/Gemini_Generated_Image_8z1gon8z1gon8z1g_t7icqt.png`, alt: `Project Avatar 2`, category: "Project" },
+    { id: 9, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1762282981/Gemini_Generated_Image_eb0lwieb0lwieb0l_m1xxyn.png`, alt: `Project Avatar 2`, category: "Project" },
     { id: 10, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750961248/Gemini_Generated_Image_6ztzvv6ztzvv6ztz_cvxbfu.png`, alt: `Internship Avatar 2`, category: "Internship" },
     { id: 11, src: `https://res.cloudinary.com/ddlepk8lb/image/upload/v1750961230/Gemini_Generated_Image_4qrb3q4qrb3q4qrb_oav7kw.png`, alt: `Skill Avatar 2`, category: "Skill" },
   ];
@@ -96,6 +97,10 @@ const CreateNfts: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if(!address || !chainId){
+      toast.error("Please connect your wallet first.");
+      return;
+    }
     const selectedAvatarSrc = preDefinedAvatars.find(
        (avatar) => avatar.id === selectedAvatar
     )?.src;
@@ -194,25 +199,43 @@ const CreateNfts: React.FC = () => {
             const tokenId = transferEvent?.args?.tokenId?.toString();
             console.log(tokenId); 
             const toastId2=toast.loading("⏳ Finalizing NFT creation...");       
-            await axios.post(
-               `${import.meta.env.VITE_API_BASE_URL}/nft/create`,
-               {
-                 ...baseNftData,
+            try {
+              const response = await apiConnector("POST",`${import.meta.env.VITE_API_BASE_URL}/nft/create` , {
+                               ...baseNftData,
                  fileUrl: imageGateway,
                  metadataUrl: metaGatewayUrl,
-                 walletAddress:walletAddress,
+                 walletAddress:address,
                  tokenId,
                  transactionHash: receiptInstance.hash,
                  chainId,
-               },
-               {
-                 headers: {
-                   "Content-Type": "application/json",
-                   Authorization: `Bearer ${token}`, // if using JWT
-                 },
-               }
-             );
-             toast.dismiss(toastId2);   
+                          },
+                        {
+                          Authorization: `Bearer ${token}`,
+                        });
+            //   await axios.post(
+            //    `${import.meta.env.VITE_API_BASE_URL}/nft/create`,
+            //    {
+            //      ...baseNftData,
+            //      fileUrl: imageGateway,
+            //      metadataUrl: metaGatewayUrl,
+            //      walletAddress:address,
+            //      tokenId,
+            //      transactionHash: receiptInstance.hash,
+            //      chainId,
+            //    },
+            //    {
+            //      headers: {
+            //        "Content-Type": "application/json",
+            //        Authorization: `Bearer ${token}`, // if using JWT
+            //      },
+            //    }
+            //  );
+            } catch (error) {
+              console.log(error);
+            }
+            finally{
+              toast.dismiss(toastId2);
+            }   
              navigate("/dashboard"); 
       } else { // Organization/Institution
         // const nftRequestData = {
