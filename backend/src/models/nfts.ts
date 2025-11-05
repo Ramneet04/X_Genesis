@@ -89,7 +89,7 @@ const NftSchema = new mongoose.Schema({
     default: "Public"
   },
   price: {
-    type: Number, // or String if in crypto
+    type: String, // or String if in crypto
     default: 0,
   },
   currency: {

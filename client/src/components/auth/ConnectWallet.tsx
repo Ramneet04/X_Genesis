@@ -5,6 +5,7 @@ import { BrowserProvider, ethers } from "ethers";
 import { resetWallet, setWallet } from "@/slices/wallet";
 import type { MetaMaskInpageProvider } from "@metamask/providers";
 import { CONTRACT_ABI, CONTRACT_ADDRESS } from "@/services/contract";
+import { RefreshCcw } from "lucide-react";
 
 declare global {
   interface Window {
@@ -104,16 +105,55 @@ const WalletConnectButton: React.FC = () => {
     setContract(null);
     toast.success("Wallet disconnected");
   };
+  const changeWallet = async () => {
+    if(!window.ethereum) {
+      toast.error("MetaMask not found!");
+      return;
+    }
+  try {
+    await window.ethereum.request({
+      method: "wallet_requestPermissions",
+      params: [{ eth_accounts: {} }],
+    });
+
+const accounts = await window.ethereum.request({ method: "eth_accounts" });
+
+    if (!accounts || accounts.length === 0) {
+      toast.error("No accounts found after permission request.");
+      return;
+    }
+
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const userAddress = await signer.getAddress();
+    const network = await provider.getNetwork();
+
+    // ✅ Update your Redux state
+    dispatch(setWallet({ address: userAddress, chainid: network.chainId.toString() }));
+
+    toast.success("Wallet switched successfully");
+    // update your redux/store here
+  } catch (error) {
+    console.error("User denied permission:", error);
+  }
+};
+
 
   return (
     <>
       {isConnected && address ? (
-        <button
+        <div className="flex gap-2">
+          <button
           onClick={handleDisconnect}
           className="px-3 py-2 bg-red-500 hover:bg-red-700 text-white font-semibold rounded-xl transition duration-200"
         >
           Disconnect ({address.slice(0, 6)}...{address.slice(-4)})
         </button>
+         <button onClick={changeWallet} className=" text-white bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-700 hover:from-cyan-400 hover:via-blue-500 hover:to-indigo-600 rounded-xl p-2 flex items-center justify-center">
+            <RefreshCcw/>
+       </button>
+        </div>
+
       ) : (
         <button
           onClick={handleConnect}

@@ -16,7 +16,7 @@ const Navbar = () => {
   const [dropdownTimeout, setDropdownTimeout] = useState<NodeJS.Timeout | null>(null);
 
   const dropdownItems = {
-    explore: ['NFT Gallery', 'Institutions', 'Certificates', 'Achievements'],
+    explore: [['About Us','/aboutUs'], ['Institutions',''], ['Certificates',''], ['Achievements','']],
     about: ['Our Mission', 'Team', 'Roadmap', 'Partners'],
   };
 
@@ -52,7 +52,11 @@ const Navbar = () => {
           <Link to={"/"} className="text-gray-300 hover:text-white font-medium transition-colors">
             Home
           </Link>
-          
+          <div>
+            <Link to={"/nft-gallery"} className="text-gray-300 hover:text-white font-medium transition-colors">
+              NFT Gallery
+            </Link>
+          </div>
           {/* Explore Dropdown */}
           <div className="relative">
             <button
@@ -72,20 +76,14 @@ const Navbar = () => {
                 {dropdownItems.explore.map((item, index) => (
                   <a 
                     key={index} 
-                    href="#" 
+                    href={item[1]} 
                     className="block font-semibold px-4 py-3 text-sm text-gray-300 rounded-xl hover:bg-gradient-to-r hover:from-cyan-600 hover:via-blue-700 hover:to-indigo-800 hover:text-white transition-colors"
                   >
-                    {item}
+                    {item[0]}
                   </a>
                 ))}
               </div>
             )}
-          </div>
-
-          <div>
-            <Link to={"/aboutUs"} className="text-gray-300 hover:text-white font-medium transition-colors">
-              About Us
-            </Link>
           </div>
 
          <Link

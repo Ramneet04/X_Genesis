@@ -3,6 +3,7 @@ import Nft from "../models/nfts";
 import Like from "../models/likes";
 import Rating from "../models/ratings";
 import endorsement from "../models/endorsement";
+import User from "../models/user";
 
 export const createNft = async (req:any, res:any) => {
   try {
@@ -108,7 +109,7 @@ export const getNftById = async(req:Request, res:Response)=>{
   }
 };
 
-export const getAllNft = async (req:Request, res:Response)=>{
+export const getAllNft = async (req:any, res:any)=>{
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
@@ -118,10 +119,10 @@ export const getAllNft = async (req:Request, res:Response)=>{
     })
     .skip(skip)
     .limit(limit)
+    .populate("userId", "userName email")
+    .populate("contributors.userId", "userName email")
+    // .populate("organization", "name")
     .sort({mintedAt:-1})
-    .populate("userId", "userName email walletAddress")
-    .populate("contributors.userId", "userName email walletAddress")
-    .populate("organization", "name")
 
     const nftData = await Promise.all(
       nfts.map(async(nft)=>{
@@ -188,12 +189,12 @@ export const getUsersNfts = async(req:any, res:any)=>{
     const skip = (page-1) * limit;
     const userId = (req as any).user.id;
     console.log(userId);
-    const nfts = await Nft.find({ userId:userId })
+    const nfts = await Nft.find({ currentOwner:userId })
     .skip(skip)
     .limit(limit)
     // .populate("organization", "name")
-    // .populate("contributors.userId", "userName email walletAddress")
-    // .sort({ mintedAt: -1 });
+    .populate("contributors.userId", "userName email walletAddress")
+    .sort({ mintedAt: -1 });
     console.log("hiiiiiii");
 
   const nftData = await Promise.all(
@@ -375,5 +376,101 @@ export const updateNftVisibility = async (req:Request, res:Response)=>{
       message: "Server Error updating Nft visibility",
       success: false,
     })
+  }
+};
+export const listNftForSale = async (req:any, res:any)=>{
+  try {
+    const {tokenId, price} = req.body;
+    if(!tokenId || !price){
+      return res.status(400).json({
+        message: "TokenId and price are required",
+        success: false
+      });
+    }
+    const nft = await Nft.findOne({tokenId: tokenId});
+    if(!nft){
+      return res.status(404).json({ 
+        message: "NFT not found",
+        success: false
+      });
+    } 
+    nft.isListed = true;
+    nft.price = price;
+    await nft.save();   
+    return res.status(200).json({
+      message: "NFT listed for sale successfully",
+      success: true,      
+      data: {
+        id: nft._id,
+        tokenId: nft.tokenId, 
+        isListed: nft.isListed,
+        price: nft.price
+      }
+    });
+  } catch (error) {
+    console.error("Error listing NFT for sale:", error);
+    return res.status(500).json({ 
+      message: "Server error listing NFT for sale",
+      success: false
+    });
+  }
+};
+
+export const buyNft = async (req:any, res:any) => {
+  try {
+    const { tokenId, walletAddress } = req.body;
+
+    if (!tokenId || !walletAddress) {
+      return res.status(400).json({
+        message: "tokenId and walletAddress are required",
+        success: false,
+      });
+    }
+
+    // Find the NFT by tokenId
+    const nft = await Nft.findOne({ tokenId });
+    if (!nft) {
+      return res.status(404).json({
+        message: "NFT not found",
+        success: false,
+      });
+    }
+
+    // Find the user with this wallet address
+    const userId = (req as any).user.id;
+    if (!userId) {
+      return res.status(401).json({
+        message: "Unauthorized: User not found",
+        success: false,
+      });
+    }
+    const newOwner = await User.findOne({ _id: userId });
+
+    // Even if user not found, still update walletAddress
+    nft.walletAddress = walletAddress;
+    if (newOwner) {
+      nft.currentOwner = newOwner._id;
+    }
+    nft.isListed = false; 
+    nft.price = "0";
+
+    await nft.save();
+
+    return res.status(200).json({
+      message: "NFT ownership updated successfully",
+      success: true,
+      data: {
+        id: nft._id,
+        tokenId: nft.tokenId,
+        newOwnerWallet: nft.walletAddress,
+        currentOwner: nft.currentOwner,
+      },
+    });
+  } catch (error) {
+    console.error("Error selling NFT:", error);
+    return res.status(500).json({
+      message: "Server error while selling NFT",
+      success: false,
+    });
   }
 };

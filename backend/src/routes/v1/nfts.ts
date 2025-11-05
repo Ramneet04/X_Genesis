@@ -1,7 +1,10 @@
 import { Router } from "express";
-import { createNft, getUsersNfts } from "../../controllers/nfts";
+import { buyNft, createNft, getAllNft, getUsersNfts, listNftForSale } from "../../controllers/nfts";
 import { auth, isUser } from "../../middlewares/auth";
 const router: Router = Router();
 router.post("/create",auth,isUser,createNft);
 router.get("/user-nfts",auth,isUser,getUsersNfts);
+router.get("/all-nfts",getAllNft);
+router.post("/list",auth,isUser,listNftForSale);
+router.post("/buy",auth,isUser,buyNft);
 export default router;

@@ -56,7 +56,7 @@ const initialState: UserState = {
     profile: false,
     friends: false,
     },
-    token: localStorage.getItem("token") ? localStorage.getItem("token") : null,
+    token: localStorage.getItem("token") ? JSON.parse(localStorage.getItem("token") as string) : null,
     error: null,
     signupData: null
 }

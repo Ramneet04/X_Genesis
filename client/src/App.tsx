@@ -9,6 +9,7 @@ import VerifyEmail from './pages/VerifyEmail'
 import CreateNfts from './pages/CreateNft'
 import OrganizationRegistrationForm from './pages/Organizations'
 import Dashboard from './pages/Dashbaord'
+import NFTGallery from './pages/NftGallery'
 
 function App() {
 
@@ -25,6 +26,7 @@ function App() {
         <Route path="/create-nft" element={<CreateNfts/>}></Route>
         <Route path="/create-organization" element={<OrganizationRegistrationForm/>}></Route>
         <Route path="/dashboard" element={<Dashboard/>}></Route>
+        <Route path="/nft-gallery" element={<NFTGallery/>}></Route>
       </Routes>
     </div>
     </>

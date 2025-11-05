@@ -19,10 +19,11 @@ export const auth = async (req:any, res:any, next: any)=>{
             if (!process.env.JWT_SECRET) {
                 throw new Error("JWT_SECRET is not defined in environment variables");
             }
-            const decode = await jwt.verify(token, process.env.JWT_SECRET);
+            const decode = jwt.verify(token, process.env.JWT_SECRET);
             console.log(decode);
             (req as any).user = decode;
         } catch (error) {
+            console.log("invalid tken-->",error);
             return res.status(401).json({
                 message: "Invalid token",
                 success: false
