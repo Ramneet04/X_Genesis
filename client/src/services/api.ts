@@ -6,3 +6,7 @@ export const authEndpoints = {
     SEND_OTP_API: `${BASE_URL}/auth/send-otp`,
     CHECK_USERNAME_API: `${BASE_URL}/auth/check-username`
 }
+export const nftEndpoints = {
+    CREATE_NFT_API: `${BASE_URL}/nfts/create`,
+    GET_USER_NFTS_API: `${BASE_URL}/nfts/user-nfts`,
+}

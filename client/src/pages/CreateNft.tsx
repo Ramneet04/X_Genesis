@@ -172,7 +172,7 @@ const CreateNfts: React.FC = () => {
           console.log(contractInstance);
           let receiptInstance;
          try {
-              const tx = await contract.safeMint(metaIpfsUrl);
+              const tx = await contractInstance.safeMint(metaIpfsUrl);
               const receipt = await tx.wait();
               receiptInstance=receipt;
               if (!receipt?.hash) {
@@ -187,10 +187,14 @@ const CreateNfts: React.FC = () => {
               toast.dismiss(toastId);
               toast.error(`Minting failed: ${error.message}`);
             }
+            if (!receiptInstance) {
+              toast.error("Minting failed, no receipt available.");
+              return;
+            }
             const transferEvent = receiptInstance.logs
                 .map((log) => {
                   try {
-                    return contract.interface.parseLog(log);
+                    return contractInstance.interface.parseLog(log);
                   } catch {
                     return null;
                   }

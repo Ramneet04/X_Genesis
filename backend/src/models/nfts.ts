@@ -8,8 +8,8 @@ const NftSchema = new mongoose.Schema({
     required: true,
   },
   currentOwner: {
-  type: mongoose.Schema.Types.ObjectId,
-  ref: "User"
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User"
   },
 
   title: {
