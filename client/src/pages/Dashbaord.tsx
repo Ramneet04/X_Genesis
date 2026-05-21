@@ -38,6 +38,7 @@ const Dashboard: React.FC = () => {
           { Authorization: `Bearer ${token}` }
         );
         if (response.data.success) {
+          console.log('Fetched NFTs:', response.data.data);
           dispatch(setNfts(response.data.data));
         }
       } catch (error) {
@@ -146,12 +147,28 @@ const Dashboard: React.FC = () => {
               {listedNfts.map((nft) => (
                 <Dialog key={nft._id}>
                   <DialogTrigger asChild>
-                    <div className="cursor-pointer bg-gray-900/60 border border-gray-800 rounded-2xl overflow-hidden shadow-md hover:shadow-green-500/20 transition-all">
-                      <img
-                        src={nft.fileUrl}
-                        alt={nft.title}
-                        className="w-full h-48 object-center"
-                      />
+                    <div className="cursor-pointer bg-gray-900/60 border border-gray-800 rounded-2xl overflow-hidden shadow-md hover:shadow-green-500/20 transition-all group relative">
+                      <div className="relative w-full h-48">
+                        <img
+                          src={nft.fileUrl}
+                          alt={nft.title}
+                          className="w-full h-full object-center"
+                        />
+                        {/* Overlay for file/document link (prefer documentUrl for new NFTs, fallback to fileUrl for old) */}
+                        {((typeof nft.documentUrl === 'string' && nft.documentUrl.trim() !== '') || (typeof nft.fileUrl === 'string' && nft.fileUrl.trim() !== '')) && (
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity z-10">
+                            <a
+                              href={nft.documentUrl && nft.documentUrl.trim() !== '' ? nft.documentUrl : nft.fileUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-white bg-green-600 px-4 py-2 rounded-lg font-semibold hover:bg-green-500 transition-all shadow-lg"
+                              onClick={e => e.stopPropagation()}
+                            >
+                              View Attached File
+                            </a>
+                          </div>
+                        )}
+                      </div>
                       <div className="p-4 space-y-2">
                         <h4 className="text-lg font-semibold">{nft.title}</h4>
                         <p className="text-gray-400 text-sm line-clamp-2">
@@ -206,6 +223,17 @@ const Dashboard: React.FC = () => {
                         {new Date(nft.mintedAt).toLocaleString()}
                       </p>
                     </div>
+                    {/* List NFT Button (if not listed) */}
+                    {!nft.isListed && (
+                      <div className="flex justify-end mt-6">
+                        <Button
+                          className="bg-yellow-600 hover:bg-yellow-500 text-white rounded-xl px-6 py-2"
+                          onClick={() => handleOpenPriceDialog(nft)}
+                        >
+                          List NFT
+                        </Button>
+                      </div>
+                    )}
                   </DialogContent>
                 </Dialog>
               ))}
@@ -226,13 +254,27 @@ const Dashboard: React.FC = () => {
               {unlistedNfts.map((nft) => (
                 <Dialog key={nft._id}>
                   <DialogTrigger asChild>
-                    <div className="cursor-pointer bg-gray-900/60 border border-gray-800 rounded-2xl overflow-hidden shadow-md hover:shadow-yellow-500/20 transition-all">
-                      <div className="h-[220px] rounded-xl">
+                    <div className="cursor-pointer bg-gray-900/60 border border-gray-800 rounded-2xl overflow-hidden shadow-md hover:shadow-yellow-500/20 transition-all group relative">
+                      <div className="relative h-[220px] rounded-xl">
                         <img
                           src={nft.fileUrl}
                           alt={nft.title}
                           className="w-full h-full"
                         />
+                        {/* Overlay for file/document link (prefer documentUrl for new NFTs, fallback to fileUrl for old) */}
+                        {((typeof nft.documentUrl === 'string' && nft.documentUrl.trim() !== '') || (typeof nft.fileUrl === 'string' && nft.fileUrl.trim() !== '')) && (
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity z-10">
+                            <a
+                              href={nft.documentUrl && nft.documentUrl.trim() !== '' ? nft.documentUrl : nft.fileUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-white bg-yellow-600 px-4 py-2 rounded-lg font-semibold hover:bg-yellow-500 transition-all shadow-lg"
+                              onClick={e => e.stopPropagation()}
+                            >
+                              View Attached File
+                            </a>
+                          </div>
+                        )}
                       </div>
                       <div className="p-4 space-y-2">
                         <h4 className="text-lg font-semibold">{nft.title}</h4>

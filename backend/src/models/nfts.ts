@@ -29,9 +29,15 @@ const NftSchema = new mongoose.Schema({
   },
 
 
+
   fileUrl: {
-    type: String, // IPFS URL of certificate or project image
+    type: String, // Avatar/thumbnail image (for backward compatibility)
     required: true,
+  },
+
+  documentUrl: {
+    type: String, // Main document/file uploaded or provided link
+    required: false, // Only for new NFTs, not required for old ones
   },
 
   metadataUrl: {

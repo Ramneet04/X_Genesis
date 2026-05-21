@@ -19,6 +19,7 @@ interface NFT {
   title: string;
   description: string;
   fileUrl: string;
+  documentUrl?: string; // main document or link (new NFTs)
   walletAddress: string;
   price: string;
   currency: string;
@@ -118,13 +119,27 @@ const NFTGallery: React.FC = () => {
               {nfts.map((nft) => (
                 <Dialog key={nft._id}>
                   <DialogTrigger asChild>
-                    <div className="cursor-pointer bg-gray-900/60 border border-gray-800 rounded-2xl overflow-hidden shadow-md hover:shadow-indigo-500/20 transition-all">
+                    <div className="cursor-pointer bg-gray-900/60 border border-gray-800 rounded-2xl overflow-hidden shadow-md hover:shadow-indigo-500/20 transition-all group relative">
                       <div className="h-[220px] overflow-hidden">
                         <img
                           src={nft.fileUrl}
                           alt={nft.title}
                           className="w-full h-full object-cover"
                         />
+                        {/* Overlay for file/document link (prefer documentUrl for new NFTs) */}
+                        {(nft.documentUrl || nft.fileUrl) && (
+                          <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity z-10">
+                            <a
+                              href={nft.documentUrl || nft.fileUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-white bg-indigo-600 px-4 py-2 rounded-lg font-semibold hover:bg-indigo-500 transition-all shadow-lg"
+                              onClick={e => e.stopPropagation()}
+                            >
+                              View Attached File
+                            </a>
+                          </div>
+                        )}
                       </div>
                       <div className="p-4 space-y-2">
                         <h4 className="text-lg font-semibold">{nft.title}</h4>
@@ -135,7 +150,6 @@ const NFTGallery: React.FC = () => {
                           <span className="text-indigo-400 font-medium">
                             {nft.price} {nft.currency || "ETH"}
                           </span>
-
                           {address?.toLowerCase() ===
                           nft.walletAddress?.toLowerCase() ? (
                             <Button

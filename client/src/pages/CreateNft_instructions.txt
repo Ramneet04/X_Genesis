@@ -1,0 +1,11 @@
+import UploadPDF from "@/components/ui/UploadPDF";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/reducers/index";
+
+// ...existing imports and code...
+
+// Inside your CreateNfts component, after contributors section and before the external link input:
+// <UploadPDF onUpload={(url, plagiarism) => { setFileUrl(url); setPlagiarismInfo(plagiarism); }} />
+// And display plagiarism info if available
+
+// ...existing code...

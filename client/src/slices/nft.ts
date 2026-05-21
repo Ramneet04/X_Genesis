@@ -31,11 +31,21 @@ type NftState = {
   error: string | null;
 };
 
-const initialState: NftState = {
+
+type PlagiarismInfo = {
+  isPlagiarised: boolean;
+  plagiarismScore: number;
+  matches: any[];
+};
+
+const initialState: NftState & { documentUrl?: string; plagiarismInfo?: PlagiarismInfo } = {
   nfts: [],
   loading: false,
   error: null,
+  documentUrl: undefined,
+  plagiarismInfo: undefined,
 };
+
 
 const nftSlice = createSlice({
   name: "nft",
@@ -60,10 +70,16 @@ const nftSlice = createSlice({
     setError(state, action: PayloadAction<string | null>) {
       state.error = action.payload;
     },
+    setDocumentUrl(state, action: PayloadAction<string>) {
+      state.documentUrl = action.payload;
+    },
+    setPlagiarismInfo(state, action: PayloadAction<PlagiarismInfo>) {
+      state.plagiarismInfo = action.payload;
+    },
   },
 });
 
-export const { setNfts, addNft, updateNft, removeNft, setLoading, setError } =
+export const { setNfts, addNft, updateNft, removeNft, setLoading, setError, setDocumentUrl, setPlagiarismInfo } =
   nftSlice.actions;
 
 export default nftSlice.reducer;
